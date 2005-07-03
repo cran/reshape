@@ -23,15 +23,7 @@
 #X anova(models[[3,1]])
 stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE) {
 	if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
-	# Can we think of stamp in a simpler way?
-	# If one part creates an array with the correct data in each cell, then the second
-	# part would only need to run apply.
-
-	subset <- eval(substitute(subset), data, parent.frame())  
-	if (is.null(formula)) return(fun.aggregate(data))
-	data <- data[subset, ]  
-	variables <- cast_parse_formula(formula, names(data))
-	stamp.work(data, variables, fun.aggregate, margins=margins, ...)
+	cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE)
 }
 
 # Condense a data frame
@@ -57,61 +49,4 @@ condense.df <- function(data, variables, fun, ...) {
 	cols <- sorted[!duplicates,variables, drop=FALSE]
 	cols$results <- array(results)
 	cols
-}
-
-# Stamp work
-# This is the workhouse that powers the stamp function.
-# 
-# You shouldn't call this function, please use \code{\link{stamp}}
-# instead.
-# 
-# @arguments data frame
-# @arguments variables (list of character vectors)
-# @arguments stamping function, should take a dataframe as it's first arugment
-# @arguments variables to margin over (character vector, or TRUE, for all margins)
-# @arguments arguments passed to stamping function
-# @keyword internal
-stamp.work <- function(data, vars=list(NULL, NULL), fun, margins=NULL, ...) {
-	rows <- vars[[1]]
-	cols <- vars[[2]]
-	
-	variables <- c(rows, cols)
-	if (!missing(margins) && isTRUE(margins)) margins <- c(variables, "grand_row", "grand_col")
-	
-	data.r <- condense.df(data, variables, fun, ...)
-	
-	if (length(margins) > 0) {
-		margins.all <- margin.vars(rows, cols, margins)
-		#browser()
-		margins.r <- do.call("rbind.fill",lapply(margins.all, function(x) condense.df(data, x, fun, ...)))
-		data.r <- rbind.fill(data.r, margins.r)
-	}
-	
-	result <- sort.df(data.r, c(rows,cols))
-	result <- add.all.combinations(result, vars)
-
-	row.names <- dim.names(result, rows)
-	col.names <- dim.names(result, cols)
-
-	reshaped <- matrix(result$result, nrow=nrow(row.names), ncol=nrow(col.names), byrow=TRUE)
-	
-	rownames(reshaped) <- 1:nrow(reshaped)
-	#attr(reshaped, "r.col.names") <- col.names
-	#attr(reshaped, "r.row.names") <- row.names
-	cast_matrix(reshaped, list(row.names, col.names))
-	#reshaped
-}
-
-# Dimension names
-# Convenience method for extracting row and column names 
-# 
-# @arguments data frame
-# @arguments variables to use
-# @keyword internal
-dim.names <- function(data, vars) {
-	if (!is.null(vars) && length(vars) > 0) {
-		unique(data[,vars,drop=FALSE]) 
-	} else {
-		data.frame(value="value") # use fun.aggregate instead of "value"? 
-	}
 }

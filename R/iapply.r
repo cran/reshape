@@ -1,7 +1,5 @@
-
 # Idempotent apply
-# A version of apply that works like apply, but returns the array
-# in the same shape as the original.
+# A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with 
 # 
 # Applied function should return an array, matrix or vector.
 # 
@@ -9,34 +7,53 @@
 # @arguments margins to apply over
 # @arguments function to apply
 # @arguments other arguments pass to function
-# @arguments reduce extra dimension?
+# @arguments remove extraneous (length 1) dimensions?
+# @arguments use original dimnames?
+# @argument reorder 
 # @keyword manip 
 #X a <- array(1:27, c(2,3,4))
 #X all.equal(a, iapply(a, 1, force))
+#X all.equal(a, iapply(a, 2, force))
+#X all.equal(a, iapply(a, 3, force))
 #X all.equal(a, iapply(a, 1:2, force))
-#X all.equal(a, iapply(a, 1:3, force))
-#X all.equal(aperm(a, c(2,1,3)), iapply(a, 2, force))
-#X all.equal(aperm(a, c(3,1,2)), iapply(a, 3, force))
+#X all.equal(aperm(a, c(2,1,3)), iapply(a, 2, force, REORDER=FALSE))
+#X all.equal(aperm(a, c(3,1,2)), iapply(a, 3, force, REORDER=FALSE))
 #X 
-#X iapply(a, 1, min)   
-#X iapply(a, 2, min)   
-#X iapply(a, 3, min)   
-#X iapply(a, 1, range)   
-#X iapply(a, 2, range)   
-#X iapply(a, 3, range)   
-iapply <- function(x, margins=1, fun, ..., REDUCE=TRUE) { 
+#X iapply(a, 1, min)
+#X iapply(a, 1, min, DROP=TRUE)
+#X iapply(a, 2, min)
+#X iapply(a, 2, min, DROP=TRUE)
+#X iapply(a, 3, min)
+#X iapply(a, 3, min, DROP=TRUE)
+#X iapply(a, 1, range)
+#X iapply(a, 2, range)
+#X iapply(a, 3, range)
+#X
+#X mina <- iapply(a, 1, min)
+#X sweep(a, 1, mina)
+#X mina <- iapply(a, c(1,3), min)
+#X sweep(a, c(1,3), mina)
+iapply <- function(x, margins=1, fun, ..., DROP=FALSE, COPY.DIMNAMES=FALSE, REORDER=TRUE) { 
 	if (!is.array(x)) x <- as.array(x)
+	olddim <- dim(x)
+	olddimnames <- dimnames(x)
 	
 	reorder <- c(margins, (1:length(dim(x)))[-margins])
 
-	x <- aperm(x, (reorder))
+	x <- aperm(x, reorder)
 	x <- compactify(x, length(margins))
 
 	results <- lapply(x, fun, ...)
 	dim(results) <- dim(x)
 	
 	results <- decompactify(results)
-	if (REDUCE) reduce(results) else results
+	
+	if (REORDER) {
+	  dim(results) <- c(dim(results), rep(1, length(reorder) - length(dim(results))))
+	  results <- aperm(results, reorder)
+	}
+	if (COPY.DIMNAMES && identical(olddim, dim(results))) dimnames(results) <- olddimnames
+	if (DROP) reduce(results) else results
 }
 
 

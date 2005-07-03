@@ -16,10 +16,7 @@
 }
 
 \details{This conveniently wraps melting and casting a data frame into
-one step.
-
-Todo: take advantage of reshape formula to reduce number of
-columns in molten data frame to save time/spcae.}
+one step.}
 \seealso{\url{http://had.co.nz/reshape/}}
-\examples{}
+\examples{recast(french_fries, time ~ variable, id.var=1:4)}
 \keyword{manip}

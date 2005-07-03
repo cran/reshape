@@ -1,6 +1,6 @@
 \name{cast_parse_formula}
 \alias{cast_parse_formula}
-\title{cast parse formula}
+\title{Cast parse formula}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
@@ -16,7 +16,12 @@ Parse formula for casting
  \item{col character vector of column names}
  \item{aggregate boolean whether aggregation will occur}
 }
-\details{}
+\details{@value row character vector of row names
+@value col character vector of column names
+@value aggregate boolean whether aggregation will occur
+@keyword internal}
 
-\examples{}
+\examples{cast_parse_formula("a + ...", letters[1:6])
+cast_parse_formula("a | ...", letters[1:6])
+cast_parse_formula("a + b ~ c ~ . | ...", letters[1:6])}
 \keyword{internal}

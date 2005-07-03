@@ -6,11 +6,11 @@
 \description{
 Works out list of variables to margin over to get desired margins.
 }
-\usage{margin.vars(rows = NULL, cols = NULL, margins = NULL)}
+\usage{margin.vars(vars = list(NULL, NULL), margins = NULL)}
 \arguments{
-\item{rows}{column variables}
-\item{cols}{row variables}
-\item{margins}{vector of variable names to margin over.}
+\item{vars}{column variables}
+\item{margins}{row variables}
+\item{}{vector of variable names to margin over.}
 }
 
 \details{Variables that can't be margined over are dropped silently.}

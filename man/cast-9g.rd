@@ -6,7 +6,7 @@
 \description{
 Cast a molten data frame into the reshaped or aggregated form you want
 }
-\usage{cast(data, formula = ... ~ variable, fun.aggregate, ..., margins, subset=TRUE)}
+\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE)}
 \arguments{
 \item{data}{molten data frame, see \code{\link{melt}}}
 \item{formula}{casting formula, see details for specifics}
@@ -14,16 +14,20 @@ Cast a molten data frame into the reshaped or aggregated form you want
 \item{...}{further arguments are passed to aggregating function}
 \item{margins}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
 \item{subset}{logical vector to subset data set with before reshaping}
+\item{df}{}
 }
 
 \details{Along with \code{\link{melt}}  and \link{recast}, this is the only function you should ever need to use.
 Once you have melted your data, cast will arrange it into the form you desire
 based on the specification given by \code{formula}.
 
-The cast formula has the following format: \code{row_variable_1 + row_2 ~ col_variable + col_2}
+The cast formula has the following format: \code{x_variable + x_2 ~ y_variable + y_2 ~ z_variable ~  ... | list_variable + ... }
 The order of the variables makes a difference.  The first varies slowest, and the last
 fastest.  There are a couple of special variables: "..." represents all other variables
 not used in the formula and "." represents no variable, so you can do \code{formula=var1 ~ .}
+
+Creating high-D arrays is simple, and allows a class of transformations that are hard
+without \code{\link{iapply}} and \code{\link{sweep}}
 
 If the combination of variables you supply does not uniquely identify one row in the
 original data set, you will need to supply an aggregating function, \code{fun.aggregate}.
@@ -42,16 +46,19 @@ so you can do something like \code{subset = variable=="length"}
 
 All the actual reshaping is done by \code{\link{reshape1}}, see its documentation
 for details of the implementation}
-\seealso{\code{\link{reshape1}}, \url{http://had.co.nz/reshape/}}
+\seealso{\code{\link{reshape1}}, vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}}
 \examples{#Air quality example
 names(airquality) <- tolower(names(airquality))
 airquality.d <- melt(airquality, id=c("month", "day"), preserve.na=FALSE)
 
+cast(airquality.d, day ~ month ~ variable)
 cast(airquality.d, month ~ variable, mean)
+cast(airquality.d, month ~ . | variable, mean)
 cast(airquality.d, month ~ variable, mean, margins=c("grand_row", "grand_col"))
 cast(airquality.d, day ~ month, mean, subset=variable=="ozone")
 cast(airquality.d, month ~ variable, range)
 cast(airquality.d, month ~ variable + result_variable, range)
+cast(airquality.d, variable ~ month ~ result_variable,range)
 
 #Chick weight example
 names(ChickWeight) <- tolower(names(ChickWeight))
@@ -59,6 +66,7 @@ chick.d <- melt(ChickWeight, id=2:4, preserve.na = FALSE)
 
 cast(chick.d, time ~ variable, mean) # average effect of time
 cast(chick.d, diet ~ variable, mean) # average effect of diet
+cast(chick.d, diet ~ time ~ variable, mean) # average effect of diet & time
 
 # How many chicks at each time? - checking for balance
 cast(chick.d, time ~ diet, length)
@@ -66,16 +74,18 @@ cast(chick.d, chick ~ time, mean)
 cast(chick.d, chick ~ time, mean, subset=time < 10 & chick < 20)
 
 cast(chick.d, diet + chick ~ time)
+cast(chick.d, chick ~ time ~ diet)
 cast(chick.d, diet + chick ~ time, mean, margins="diet")
-#Tips example
-data(tips)
-cast(melt(tips), sex ~ smoker, mean, subset=variable=="total_bill")
 
-data(french_fries)
-ff_d <- melt(french_fries, id=1:4)
+#Tips example
+cast(melt(tips), sex ~ smoker, mean, subset=variable=="total_bill")
+cast(melt(tips), sex ~ smoker | variable, mean)
+
+ff_d <- melt(french_fries, id=1:4, preserve.na=FALSE)
 cast(ff_d, subject ~ time, length)
 cast(ff_d, subject ~ time, function(x) 30 - length(x))
 cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
+cast(ff_d, variable ~ ., function(x) quantile(x,c(0.25,0.5)))
 cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")}

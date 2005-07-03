@@ -1,14 +1,22 @@
 # Melt
-# Melt a data frame into form suitable for easy casting.
+# Melt an object into a form suitable for easy casting.
 #
-# Along with \link{cast} and \link{recast}, melt is the only function from this package
-# you will actually use.  The rest are all support functions for these two.
-# melt gets your data into a suitable form (molten) for cast to work on.
+# See \code{\link{melt.data.frame}} and \code{\link{melt.array}} for details.
+#
+# @keyword manip
+# @arguments Data set to melt
+# @arguments Other arguments passed to the melt function
+melt <- function(data, ...) 
+  UseMethod("melt", data)
+
+
+# Melt
+# Melt a data frame into form suitable for easy casting.
 #
 # You need to tell melt which of your variables are id variables, and 
 # which are measured variables.  For most practical uses, the id variables
 # will be categorical, and the measured variables continuous.   If you only 
-# supply one of id.var and measure.var, melt will assume the remainder of 
+# supply one of \code{id.var} and \code{measure.var}, melt will assume the remainder of 
 # the variables in the data set belong to the other.  If you supply neither, 
 # melt will assume integer and factor  variables are id variables, 
 # and all other are measured.
@@ -20,7 +28,7 @@
 # @arguments Should NAs be preserved or dropped from the data set?
 # @value molten data
 # @keyword manip
-# @seealso \url{http://had.co.nz/reshape/}
+# @seealso vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}
 #X data(tips)
 #X head(melt(tips))
 #X names(airquality) <- tolower(names(airquality))
@@ -28,10 +36,10 @@
 #X head(airquality.d)
 #X names(ChickWeight) <- tolower(names(ChickWeight))
 #X chick.d <- melt(ChickWeight, id=2:4)
-melt <- function(data, id.var, measure.var, variable_name = "variable", preserve.na = TRUE) {
+melt.data.frame <- function(data, id.var, measure.var, variable_name = "variable", preserve.na = TRUE, ...) {
 	remove.na <- function(df) if (preserve.na) df else df[complete.cases(df),,drop=FALSE]
 
-	var <- melt.check(data, id.var, measure.var)
+	var <- melt_check(data, id.var, measure.var)
 	
 	if (length(var$measure) == 0) {
 		return(remove.na(data[,var$id, drop=FALSE]))
@@ -48,10 +56,54 @@ melt <- function(data, id.var, measure.var, variable_name = "variable", preserve
 	remove.na(df)
 }
 
+# Melt an array
+# This function melts a high-dimensional array into a form that you can use \code{\link{cast}} with.
+#
+# @arguments array to melt
+# @arguments variable names to use in molten data.frame
+# @keyword manip
+#X a <- array(1:24, c(2,3,4))
+#X melt(a)
+#X melt(a, varnames=c("X","Y","Z"))
+#X dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
+#X melt(a)
+#X melt(a, varnames=c("X","Y","Z"))
+melt.array <- function(data, varnames = paste("V", 1:length(dim(data)), sep=""), ...) {
+  values <- as.vector(data)
+  
+  if (is.null(dimnames(data))) {
+    indicies <- do.call(expand.grid, lapply(dim(data), function(x) 1:x))
+  } else {
+    indicies <- do.call(expand.grid, dimnames(data))
+  }
+  names(indicies) <- varnames
+  data.frame(indicies, value=values)
+}
+
+# Melt cast data.frames
+# After casting into a particular form, it can sometimes be useful to 
+# 
+# @keyword internal
+melt.cast_df <- function(data, ...) {
+  molten <- melt(as.data.frame(data), ...)
+  names(molten)[-ncol(molten)] <- sapply(rdimnames(data), function(x) paste(names(x), sep="_"))
+  molten
+  
+}
+
+# Melt cast matrices
+# 
+# @keyword internal
+melt.cast_matrix <- function(data, ...) {
+  molten <- melt.array(data, ...)
+  names(molten)[-ncol(molten)] <- sapply(rdimnames(data), function(x) paste(names(x), sep="_"))
+  molten
+}
+
 # Melt check.
 # Check that input variables to melt are appropriate.
 #
-# If id.var or measure.var are missing, melt.check will do its 
+# If id.var or measure.var are missing, \code{melt_check }will do its 
 # best to impute them.If you only 
 # supply one of id.var and measure.var, melt will assume the remainder of 
 # the variables in the data set belong to the other.  If you supply neither, 
@@ -64,7 +116,7 @@ melt <- function(data, id.var, measure.var, variable_name = "variable", preserve
 # @arguments Vector of Measured variable names or indexes
 # @value id list id variable names
 # @value measure list of measured variable names
-melt.check <- function(data, id.var, measure.var) {
+melt_check <- function(data, id.var, measure.var) {
 	varnames <- names(data)
 	if (!missing(id.var) && is.numeric(id.var)) id.var <- varnames[id.var]
 	if (!missing(measure.var) && is.numeric(measure.var)) measure.var <- varnames[measure.var]

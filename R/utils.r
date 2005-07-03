@@ -1,3 +1,79 @@
+# Merge together a series of data.frames
+#
+# Order of data frames should be from most complete to least complete 
+#
+# @arguments list of data frames to merge
+# @seealso \code{\link{merge_recurse}}
+# @keyword manip
+merge_all <- function(dfs, ...) {
+	if (length(dfs)==1) return(dfs[[1]])
+	df <- merge_recurse(dfs, ...)
+	df <- df[, match(names(dfs[[1]]), names(df))]
+	df[do.call("order", df[, -ncol(df), drop=FALSE]), ,drop=FALSE]
+}
+
+# Recursively merge data frames
+#
+# @arguments list of data frames to merge
+# @seealso \code{\link{merge_all}}
+# @keyword internal
+merge_recurse <- function(dfs, ...) {
+	if (length(dfs) == 2) {
+		merge(dfs[[1]], dfs[[2]], all=TRUE, sort=FALSE, ...)
+	} else {
+		merge(dfs[[1]], Recall(dfs[-1]), all=TRUE, sort=FALSE, ...)
+	}
+}
+
+# expand grid
+# expand grid of data frames
+#
+# Creates new data frame containing all combination of rows from
+# data.frames in \code{...}
+#
+# @arguments list of data frames (first varies fastest)
+# @arguments only use unique rows?
+# @keyword manip
+#X expand.grid.df(data.frame(a=1,b=1:2))
+#X expand.grid.df(data.frame(a=1,b=1:2), data.frame())
+#X expand.grid.df(data.frame(a=1,b=1:2), data.frame(c=1:2, d=1:2))
+#X expand.grid.df(data.frame(a=1,b=1:2), data.frame(c=1:2, d=1:2), data.frame(e=c("a","b")))
+expand.grid.df <- function(..., unique=TRUE) {
+	dfs <- list(...)
+
+	notempty <- sapply(dfs, ncol) != 0
+	if (sum(notempty) == 1) return(dfs[notempty][[1]])
+
+	if (unique) dfs <- lapply(dfs, unique)
+	indexes <- lapply(dfs, function(x) 1:nrow(x))
+
+	grid <- do.call(expand.grid, indexes)
+	df <- do.call(data.frame, mapply(function(df, index) df[index, ,drop=FALSE], dfs, grid))
+	colnames(df) <- unlist(lapply(dfs, colnames))
+	rownames(df) <- 1:nrow(df)
+	
+	return(df)
+}
+
+
+# Rbind fill
+# Rbind a list of data frames filling missing columns with NA 
+#
+# @arguments data frames to row bind together
+# @keyword manip
+rbind.fill <- function(...) {
+	dfs <- list(...)
+	if (length(dfs) == 0) return(list())
+
+	all.names <- unique(unlist(lapply(dfs, names)))
+	do.call("rbind", lapply(dfs, function(df) {
+		if (length(df) == 0 || nrow(df) == 0) return(df)
+ 		missing.vars <- setdiff(all.names, names(df))
+		if (length(missing.vars) > 0) df[, missing.vars] <- NA
+		df
+	}))
+}
+
 # Compact list
 # Remove all NULL entries from a list
 # 
@@ -26,7 +102,7 @@ defaults <- function(x, y)  {
 # @returns sorted data frame
 # @keyword manip 
 sort.df <- function(data, vars=names(data)) {
-	if (length(vars) == 0) return(data)
+	if (length(vars) == 0 || is.null(vars)) return(data)
 	data[do.call("order", data[,vars, drop=FALSE]), ,drop=FALSE]
 }
 
@@ -106,3 +182,24 @@ dims <- function(x) length(vdim(x))
 # @arguments array or vector
 # @keyword internal 
 vdim <- function(x) if (is.vector(x)) length(x) else dim(x)
+
+
+# Nested.by function
+# 
+# @keyword internal
+nested.by <- function(data, INDICES, FUN, ...) {
+	if (length(compact(INDICES)) == 0 || is.null(INDICES)) return(FUN(data, ...))
+	
+	FUNx <- function(x) FUN(data[x, ], ...)
+	nd <- nrow(data)
+
+	if (length(INDICES) == 1) {
+		return(with(data, tapply(1:nd, INDICES[[1]], FUNx)))
+	}
+
+	tapply(1:nd, INDICES[[length(INDICES)]], function(x) {
+		nested.by(data[x, ], lapply(INDICES[-length(INDICES)],"[", x), FUN, ...)
+	}, simplify=FALSE)
+}
+
+

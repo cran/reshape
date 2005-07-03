@@ -1,8 +1,0 @@
-                         
- result_variable  max min
-        variable  max min
-         buttery 11.2   0
-          grassy 11.1   0
-          painty 13.1   0
-          potato 14.9   0
-          rancid 14.9   0

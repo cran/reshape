@@ -6,12 +6,13 @@
 \description{
 Compute marginal values.
 }
-\usage{compute.margins(data, margins, fun.aggregate, ...)}
+\usage{compute.margins(data, margins, fun.aggregate, ..., df=FALSE)}
 \arguments{
 \item{data}{data frame}
 \item{margins}{margins to compute}
 \item{fun.aggregate}{aggregation function}
 \item{...}{other argument passed to aggregation function}
+\item{df}{}
 }
 
 \details{}

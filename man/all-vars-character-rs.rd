@@ -4,14 +4,19 @@
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-All variables in character string of formula
+All variables in character string of formula.
 }
-\usage{all.vars.character(formula)}
+\usage{all.vars.character(formula, blank.char = ".")}
 \arguments{
 \item{formula}{}
+\item{blank.char}{}
 }
 
-\details{}
+\details{Removes .}
 
-\examples{}
+\examples{all.vars.character("a + b")
+all.vars.character("a + b | c")
+all.vars.character("a + b")
+all.vars.character(". ~ a + b")
+all.vars.character("a ~ b | c + d + e")}
 \keyword{internal}

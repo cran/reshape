@@ -6,12 +6,13 @@
 \description{
 Takes data frame and variable list and casts data.
 }
-\usage{reshape1(data, vars = list(NULL, NULL), fun.aggregate, margins, ...)}
+\usage{reshape1(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, ...)}
 \arguments{
 \item{data}{data frame}
 \item{vars}{variables to appear in columns}
 \item{fun.aggregate}{variables to appear in rows}
 \item{margins}{aggregation function}
+\item{df}{should the aggregating function be supplied with the entire data frame, or just the relevant entries from the values column}
 \item{...}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
 \item{}{further arguments are passed to aggregating function}
 }
@@ -19,7 +20,7 @@ Takes data frame and variable list and casts data.
 \details{}
 \seealso{\code{\link{cast}}}
 \examples{names(airquality) <- tolower(names(airquality))
-airquality.d <- melt(airquality, id=c("month", "day"))
+airquality.d <- melt(airquality, id=c("month", "day"), preserve=FALSE)
 #Basic call
 reshape1(airquality.d, list("month", NULL), mean)
 reshape1(airquality.d, list("month", "variable"), mean)
