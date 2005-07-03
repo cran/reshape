@@ -59,7 +59,7 @@ print.cast_matrix <- function(x, digits=getOption("digits"), ...) {
 # @argument Argument required to match generic
 # @argument Argument required to match generic
 # @keyword internal
-as.data.frame.cast_matrix <- function(x, row.names, optional) {
+as.data.frame.cast_matrix <- function(x, row.names, optional, ...) {
 	unx <- unclass(x)
 	colnames(unx) <- gsub("NA", ".", apply(rcolnames(x), 1, paste, collapse="_"))
 	
