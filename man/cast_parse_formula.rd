@@ -1,12 +1,12 @@
-\name{reshape_parse_formula}
-\alias{reshape_parse_formula}
-\title{Parse formula for reshaping}
+\name{cast_parse_formula}
+\alias{cast_parse_formula}
+\title{Parse formula for casting}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
 
 }
-\usage{reshape_parse_formula(formula = ...  ~ variable, varnames)}
+\usage{cast_parse_formula(formula = ...  ~ variable, varnames)}
 \arguments{
 \item{formula}{}
 \item{varnames}{}

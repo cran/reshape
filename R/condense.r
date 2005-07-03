@@ -3,12 +3,12 @@
 #
 # Works very much like by, but keeps data in original data frame format.
 # Results column is a list, so that each cell may contain an object or a vector etc.
-# Assumes data is in deshaped format. Aggregating function must return the
+# Assumes data is in molten format. Aggregating function must return the
 # same number of arguments for all input.
 #
 # @arguments data frame
 # @arguments variables to condense over
-# @arguments aggregating function, maybe return mutliple values
+# @arguments aggregating function, may multiple values
 # @arguments further arguments passed on to aggregating function
 # @keyword manip
 condense <- function(data, variables, fun, ...) {
@@ -20,6 +20,7 @@ condense <- function(data, variables, fun, ...) {
 	cols <- unique(data[,variables, drop=FALSE])
 	cols$index <- 1:nrow(cols)
 
+	# this is rather slow
 	index <- merge(cols, data[,variables, drop=FALSE], sort=FALSE)$index
 	results <- lapply(split(data$value, index), fun, ...)
 	cols$results <- array(results)
@@ -31,7 +32,7 @@ condense <- function(data, variables, fun, ...) {
 # Expand out condensed data frame.
 #
 # If aggregating function supplied to condense returns multiple values, this
-# function "deshapes" it again, creating a new column called result\_variable.
+# function "melts" it again, creating a new column called result\_variable.
 #
 # If the aggregating funtion is a named vector, then those names will be used,
 # otherwise will be number X1, X2, ..., Xn etc.
@@ -44,9 +45,9 @@ expand <- function(data) {
 
 	first <- data[1, "results"][[1]]
 	exp <- lapply(1:length(first), function(x) as.vector(unlist(lapply(data$results, "[", x))))
-	names(exp) <- if (is.null(names(first))) paste("X", 1:length(first), sep="") else names(first)
+	names(exp) <- if (is.null(names(first))) make.names(1:length(first)) else names(first)
 
-	x <- deshape(data.frame(data[, 1:(ncol(data)-1), drop=FALSE], exp), m=names(exp),variable_name="result_variable")
+	x <- melt(data.frame(data[, 1:(ncol(data)-1), drop=FALSE], exp), m=names(exp),variable_name="result_variable", preserve.na = TRUE)
 	colnames(x)[match("value", colnames(x), FALSE)] <- "result"
 	x
 }
@@ -56,6 +57,7 @@ expand <- function(data) {
 # Clean variable list for reshaping.
 #
 # @arguments vector of variable names
+# @value Vector of "real" variable names (excluding result\_variable etc.)
 # @keyword manip
 clean.vars <- function(vars) {vars[vars != "result_variable"]}
 
@@ -100,7 +102,7 @@ margin.vars <- function(rows = NULL, cols = NULL, margins = NULL) {
 #
 # Creates new data frame containing all combination of rows from df1 and df2.
 #
-# @arguments data frame 1
+# @arguments data frame 1 (varies fastest)
 # @arguments data frame 2
 # @keyword manip
 expand.grid.df <- function(df1, df2) {
@@ -110,8 +112,8 @@ expand.grid.df <- function(df1, df2) {
 	u2 <- unique(df2)
 	index2 <- 1:nrow(u2)
 
-	if  (ncol(df1) ==0) return(u2)
-	if (ncol(df2) == 0 ) return(u1)
+	if (ncol(df1) == 0) return(u2)
+	if (ncol(df2) == 0) return(u1)
 
 	grid <- expand.grid(index1, index2)
 	df <- data.frame(u1[grid[,1],], u2[grid[,2],])
@@ -123,7 +125,7 @@ expand.grid.df <- function(df1, df2) {
 # Rbind fill
 # Rbind a list of data frames filling missing columns with NA 
 #
-# @arguments 
+# @arguments data frames to row bind together
 # @keyword manip
 rbind.fill <- function(...) {
 	dfs <- list(...)

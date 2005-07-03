@@ -8,8 +8,8 @@
 }
 \usage{check_formula(formula, varnames)}
 \arguments{
-\item{formula}{}
-\item{varnames}{}
+\item{formula}{formula to check}
+\item{varnames}{vector of variable names}
 }
 
 \details{}

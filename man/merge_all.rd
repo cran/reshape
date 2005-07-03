@@ -12,7 +12,7 @@
 \item{...}{}
 }
 
-\details{Order of data frames should be from most complete to least complete (?- CHECK)}
+\details{Order of data frames should be from most complete to least complete}
 \seealso{\code{\link{merge_recurse}}}
 \examples{}
 \keyword{manip}

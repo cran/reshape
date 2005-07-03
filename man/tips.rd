@@ -18,7 +18,7 @@ In all he recorded 244 tips. The data was reported in a collection of case studi
 for business statistics (Bryant & Smith 1995).
 
 }
-\usage{data(rivers)}
+\usage{data(tips)}
 \format{A data frame with 244 rows and 7 variables}
 \references{
 Bryant, P. G. and Smith, M (1995) \emph{Practical Data Analysis: Case Studies in Business Statistics}.  Homewood, IL: Richard D. Irwin Publishing:

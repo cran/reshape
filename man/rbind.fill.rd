@@ -8,7 +8,7 @@ Rbind a list of data frames filling missing columns with NA
 }
 \usage{rbind.fill(...)}
 \arguments{
-\item{...}{}
+\item{...}{data frames to row bind together}
 }
 
 \details{}

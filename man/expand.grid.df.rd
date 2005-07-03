@@ -8,7 +8,7 @@ Expand grid of data frames
 }
 \usage{expand.grid.df(df1, df2)}
 \arguments{
-\item{df1}{data frame 1}
+\item{df1}{data frame 1 (varies fastest)}
 \item{df2}{data frame 2}
 }
 
