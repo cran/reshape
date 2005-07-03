@@ -15,4 +15,4 @@
 \details{}
 \seealso{\code{\link{merge_all}}}
 \examples{}
-\keyword{manip}
+\keyword{internal}

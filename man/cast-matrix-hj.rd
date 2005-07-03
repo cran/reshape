@@ -15,4 +15,4 @@ Createa a new cast matrix
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

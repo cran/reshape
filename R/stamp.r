@@ -22,6 +22,7 @@
 #X dim(models)
 #X anova(models[[3,1]])
 stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE) {
+	if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
 	# Can we think of stamp in a simpler way?
 	# If one part creates an array with the correct data in each cell, then the second
 	# part would only need to run apply.
@@ -30,7 +31,7 @@ stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subse
 	if (is.null(formula)) return(fun.aggregate(data))
 	data <- data[subset, ]  
 	variables <- cast_parse_formula(formula, names(data))
-	stamp.work(data, variables$rows, variables$cols, fun.aggregate, margins=margins, ...)
+	stamp.work(data, variables, fun.aggregate, margins=margins, ...)
 }
 
 # Condense a data frame
@@ -58,18 +59,6 @@ condense.df <- function(data, variables, fun, ...) {
 	cols
 }
 
-# Sort data frame
-# Convenience method for sorting a data frame using the given variables.
-# 
-# @arguments data frame to sort
-# @arguments variables to use for sorting
-# @returns sorted data frame
-# @keyword manip 
-sort.df <- function(data, vars=names(data)) {
-	if (length(vars) == 0) return(data)
-	data[do.call("order", data[,vars, drop=FALSE]), ,drop=FALSE]
-}
-
 # Stamp work
 # This is the workhouse that powers the stamp function.
 # 
@@ -77,13 +66,15 @@ sort.df <- function(data, vars=names(data)) {
 # instead.
 # 
 # @arguments data frame
-# @arguments row variables (character vector)
-# @arguments column variables (character vector)
+# @arguments variables (list of character vectors)
 # @arguments stamping function, should take a dataframe as it's first arugment
 # @arguments variables to margin over (character vector, or TRUE, for all margins)
 # @arguments arguments passed to stamping function
-# @keyword manip 
-stamp.work <- function(data, rows = NULL, cols = NULL, fun, margins=NULL, ...) {
+# @keyword internal
+stamp.work <- function(data, vars=list(NULL, NULL), fun, margins=NULL, ...) {
+	rows <- vars[[1]]
+	cols <- vars[[2]]
+	
 	variables <- c(rows, cols)
 	if (!missing(margins) && isTRUE(margins)) margins <- c(variables, "grand_row", "grand_col")
 	
@@ -97,7 +88,7 @@ stamp.work <- function(data, rows = NULL, cols = NULL, fun, margins=NULL, ...) {
 	}
 	
 	result <- sort.df(data.r, c(rows,cols))
-	result <- add.all.combinations(result, rows, cols)
+	result <- add.all.combinations(result, vars)
 
 	row.names <- dim.names(result, rows)
 	col.names <- dim.names(result, cols)
@@ -116,7 +107,7 @@ stamp.work <- function(data, rows = NULL, cols = NULL, fun, margins=NULL, ...) {
 # 
 # @arguments data frame
 # @arguments variables to use
-# @keyword manip 
+# @keyword internal
 dim.names <- function(data, vars) {
 	if (!is.null(vars) && length(vars) > 0) {
 		unique(data[,vars,drop=FALSE]) 

@@ -15,4 +15,4 @@ Convenience method for extracting row and column names
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

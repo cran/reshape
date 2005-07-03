@@ -19,4 +19,4 @@ These methods provide easy access to the special dimension names
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

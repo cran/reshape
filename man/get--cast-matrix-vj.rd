@@ -18,4 +18,4 @@ Subset a cast matrix just like you would a normal matrix.  Preserves row and col
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

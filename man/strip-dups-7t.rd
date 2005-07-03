@@ -14,4 +14,4 @@ Strips out duplicates from data.frame and replace them with periods.
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

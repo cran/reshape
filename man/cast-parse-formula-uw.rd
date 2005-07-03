@@ -1,12 +1,12 @@
 \name{cast_parse_formula}
 \alias{cast_parse_formula}
-\title{Parse formula for casting}
+\title{cast parse formula}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-
+Parse formula for casting
 }
-\usage{cast_parse_formula(formula = ...  ~ variable, varnames)}
+\usage{cast_parse_formula(formula = "...  ~ variable", varnames)}
 \arguments{
 \item{formula}{}
 \item{varnames}{}
@@ -19,4 +19,4 @@
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

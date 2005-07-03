@@ -38,7 +38,7 @@
 # @seealso \code{\link{reshape1}}, \url{http://had.co.nz/reshape/}
 #X #Air quality example
 #X names(airquality) <- tolower(names(airquality))
-#X airquality.d <- melt(airquality, id=c("month", "day"))
+#X airquality.d <- melt(airquality, id=c("month", "day"), preserve.na=FALSE)
 #X 
 #X cast(airquality.d, month ~ variable, mean)
 #X cast(airquality.d, month ~ variable, mean, margins=c("grand_row", "grand_col"))
@@ -48,7 +48,7 @@
 #X
 #X #Chick weight example
 #X names(ChickWeight) <- tolower(names(ChickWeight))
-#X chick.d <- melt(ChickWeight, id=2:4)
+#X chick.d <- melt(ChickWeight, id=2:4, preserve.na = FALSE)
 #X 
 #X cast(chick.d, time ~ variable, mean) # average effect of time
 #X cast(chick.d, diet ~ variable, mean) # average effect of diet
@@ -70,13 +70,19 @@
 #X cast(ff_d, subject ~ time, function(x) 30 - length(x))
 #X cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
 #X cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
-#X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment", subset=subject < 5)
+#X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 #X lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")
 cast <- function(data, formula = ... ~ variable, fun.aggregate, ..., margins, subset=TRUE) {
+	dataname <- deparse(substitute(data))
 	subset <- eval(substitute(subset), data, parent.frame())  
 	data <- data[subset, ]  
-	variables <- cast_parse_formula(formula, names(data))
-	reshape1(data, variables$rows, variables$cols, fun.aggregate, margins=margins, ...)
+	variables <- cast_parse_formula(deparse(substitute(formula)), names(data))
+	
+	res <- reshape1(data, variables, fun.aggregate, margins=margins, ...)
+	attr(res, "formula") <- deparse(substitute(formula))
+	attr(res, "data") <- dataname
+	
+	res
 }
 
 # Casting workhorse.
@@ -89,45 +95,48 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate, ..., margins, su
 # @arguments vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins
 # @arguments further arguments are passed to aggregating function
 # @seealso \code{\link{cast}}
-# @keyword manip
+# @keyword internal
 #X names(airquality) <- tolower(names(airquality))
 #X airquality.d <- melt(airquality, id=c("month", "day"))
 #X #Basic call
-#X reshape1(airquality.d, c("month"), , mean)
-#X reshape1(airquality.d, c("month"), "variable", mean)
-#X reshape1(airquality.d, c("day"), "month", mean)
+#X reshape1(airquality.d, list("month", NULL), mean)
+#X reshape1(airquality.d, list("month", "variable"), mean)
+#X reshape1(airquality.d, list("day", "month"), mean)
 #X 
 #X #Explore margins
-#X reshape1(airquality.d, c("month"), , mean, "month")
-#X reshape1(airquality.d, c("month"), , mean, "grand_col")
-#X reshape1(airquality.d, c("month"), , mean, "grand_row")
+#X reshape1(airquality.d, list("month", NULL), mean, "month")
+#X reshape1(airquality.d, list("month", NULL) , mean, "grand_col")
+#X reshape1(airquality.d, list("month", NULL) , mean, "grand_row")
 #X 
-#X reshape1(airquality.d, c("month", "day"), , mean, "month")
-#X reshape1(airquality.d, c("month"), "variable", mean, "month")
-#X reshape1(airquality.d, c("variable"), "month", mean, "month")
-#X reshape1(airquality.d, c("month"), "variable", mean, c("month","variable"))
+#X reshape1(airquality.d, list(c("month", "day"), NULL), mean, "month")
+#X reshape1(airquality.d, list(c("month"), "variable"), mean, "month")
+#X reshape1(airquality.d, list(c("variable"), "month"), mean, "month")
+#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("month","variable"))
 #X 
-#X reshape1(airquality.d, c("month"), "variable", mean, c("grand_row"))
-#X reshape1(airquality.d, c("month"), "variable", mean, c("grand_col"))
-#X reshape1(airquality.d, c("month"), "variable", mean, c("grand_row","grand_col"))
+#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_row"))
+#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_col"))
+#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_row","grand_col"))
 #X 
-#X reshape1(airquality.d, c("variable","day"),"month", mean,c("variable"))
-#X reshape1(airquality.d, c("variable","day"),"month", mean,c("variable","grand_row"))
-#X reshape1(airquality.d, c("month","day"), "variable", mean, "month") 
+#X reshape1(airquality.d, list(c("variable","day"),"month"), mean,c("variable"))
+#X reshape1(airquality.d, list(c("variable","day"),"month"), mean,c("variable","grand_row"))
+#X reshape1(airquality.d, list(c("month","day"), "variable"), mean, "month") 
 #X 
 #X # Multiple fnction returns
-#X reshape1(airquality.d, c("month", "result_variable"), , range) 
-#X reshape1(airquality.d, c("month"),"result_variable" , range) 
-#X reshape1(airquality.d, c("result_variable", "month"), , range) 
+#X reshape1(airquality.d, list(c("month", "result_variable"), NULL), range) 
+#X reshape1(airquality.d, list(c("month"),"result_variable") , range) 
+#X reshape1(airquality.d, list(c("result_variable", "month"), NULL), range) 
 #X 
-#X reshape1(airquality.d, c("month", "result_variable"), "variable", range, "month")
-#X reshape1(airquality.d, c("month", "result_variable"), "variable", range, "variable")
-#X reshape1(airquality.d, c("month", "result_variable"), "variable", range, c("variable","month"))
-#X reshape1(airquality.d, c("month", "result_variable"), "variable", range, c("grand_col"))
-#X reshape1(airquality.d, c("month", "result_variable"), "variable", range, c("grand_row"))
+#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, "month")
+#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, "variable")
+#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("variable","month"))
+#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_col"))
+#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_row"))
 #X 
-#X reshape1(airquality.d, c("month"), c("variable"), function(x) diff(range(x))) 
-reshape1 <- function(data, rows = NULL, cols = NULL, fun.aggregate, margins, ...) {
+#X reshape1(airquality.d, list(c("month"), c("variable")), function(x) diff(range(x))) 
+reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate, margins, ...) {
+	rows <- vars[[1]]
+	cols <- vars[[2]]
+
 	cols.clean <- clean.vars(cols)
 	rows.clean <- clean.vars(rows)
 	variables <- c(rows.clean, cols.clean)
@@ -151,7 +160,7 @@ reshape1 <- function(data, rows = NULL, cols = NULL, fun.aggregate, margins, ...
 
 	margins.r <- compute.margins(data, margin.vars(rows.clean, cols.clean, margins), fun.aggregate, ...)
 	result <- sort.df(rbind.fill(data.r, margins.r), c(rows,cols))
-	result <- add.all.combinations(result, rows, cols)
+	result <- add.all.combinations(result, vars)
 
 	dim.names <- function(data, vars) {
 		if (!is.null(vars) && length(vars) > 0) {
@@ -170,11 +179,6 @@ reshape1 <- function(data, rows = NULL, cols = NULL, fun.aggregate, margins, ...
 	as.data.frame(cast_matrix(reshaped, list(row.names, col.names)))
 }
 
-sort.df <- function(data, vars) {
-	data[do.call("order", data[,vars, drop=FALSE]), ,drop=FALSE]
-}
-
-
 # Compute margins
 # Compute marginal values.
 # 
@@ -182,7 +186,7 @@ sort.df <- function(data, vars) {
 # @arguments margins to compute
 # @arguments aggregation function
 # @arguments other argument passed to aggregation function
-# @keyword manip 
+# @keyword internal 
 compute.margins <- function(data, margins, fun.aggregate, ...) {
 	if (length(margins) == 0) return(data.frame())
 	
@@ -195,16 +199,18 @@ compute.margins <- function(data, margins, fun.aggregate, ...) {
 }
 
 # Add all combinations
-# Add all combinations of the given rows and columsn to the data frames.
+# Add all combinations of the given rows and columns to the data frames.
 # 
 # This function is used to ensure that we have a matrix of the appropriate
 # dimensionaliy with no missing cells.
 # 
 # @arguments data.frame
-# @arguments row variables (character vector)
-# @arguments column variables (character vector)
-# @keyword manip 
-add.all.combinations <- function(data, rows, cols) {
+# @arguments variables (list of character vectors)
+# @keyword internal 
+add.all.combinations <- function(data, vars = list(NULL, NULL)) {
+	rows <- vars[[1]]
+	cols <- vars[[2]]
+
 	if (length(rows) + length(cols) == 0) return(data)
 	all.combinations <- data.frame(expand.grid.df(data[,rows, drop=FALSE], data[,cols, drop=FALSE]))
 	result <- merge_recurse(list(data, all.combinations)) 
@@ -212,52 +218,37 @@ add.all.combinations <- function(data, rows, cols) {
 	sort.df(result, c(rows,cols))
 }
 
+# cast parse formula
 # Parse formula for casting
 #
 # @value row character vector of row names
 # @value col character vector of column names
 # @value aggregate boolean whether aggregation will occur
-# @keyword manip
-cast_parse_formula <- function(formula = ...  ~ variable, varnames) {
+# @keyword internal
+cast_parse_formula <- function(formula = "...  ~ variable", varnames) {
 	check_formula(formula, varnames)
-		
-	rows <- all.vars(formula[[2]])
-	cols <- all.vars(formula[[3]])
 	
-	# Remove . (placeholder since you can't have a formula like y ~ )
-	rows <- rows[rows != "."]
-	cols <- cols[cols != "."]
+	vars <- all.vars.character(formula)
+	
+	vars <- lapply(vars, function(x) x[x != "."])
+	vars[sapply(vars, length) == 0 ] <- list(NULL)
 
-	remainder <- varnames[!(varnames %in% c(rows, cols, "value"))]
-	if (any(rows == "...")) rows <- c(rows[rows != "..."], remainder)
-	if (any(cols == "...")) cols <- c(cols[cols != "..."], remainder)
-
-	list(rows = rows, cols = cols)	
+	remainder <- varnames[!(varnames %in% c(unlist(vars), "value"))]
+	
+	lapply(vars, function(x) if (any(x == "..."))  c(x[x != "..."], remainder) else x)
 }
 
-# Parse formula
-# Parse an R formula into convenient chucks
+# Get all variables
+# All variables in character string of formula
 # 
-# @arguments formula to parse
-# @arguments variable names
-# @keyword manip 
-parse_formula <- function(formula, varnames) {
-	split.vars <- function(x) strsplit(x, "[*+]")
-	tidy_var <- function(x) lapply(x, function(x) unlist(replace(x, x == "...", list(remainder))))
-
-	formula <- strsplit(gsub("\\s+","", formula), "\\|")[[1]]
-	
-	list.vars  <- unlist(split.vars(formula[2]))
-	array.vars <- split.vars(strsplit(formula[1], "~")[[1]])
-	all.vars <- unlist(c(list.vars, array.vars))
-
-	if (length(unique(all.vars)) < length(all.vars)) stop("Variable names repeated")
-	remainder <- varnames[!(varnames %in% c(all.vars, "value"))]
-	if (!all(all.vars %in% c(".", "...","result_variable",varnames))) stop("Formula contains variables not in list of known variables")
-
-	list(list=tidy_var(list(list.vars))[[1]], array=tidy_var(array.vars))#, all=all.vars)
+# @keyword internal
+# @returns list of variables in each part of formula 
+all.vars.character <- function(formula) {
+	vars <- strsplit(formula, "~")[[1]]
+	lapply(vars, function(x) strsplit(gsub("\\s+", "", x), "[*+]")[[1]])
 }
 
+# Check formula
 # Checks that formula is a valid reshaping formula.
 #
 # \enumerate{
@@ -266,12 +257,11 @@ parse_formula <- function(formula, varnames) {
 # }
 # @arguments formula to check
 # @arguments vector of variable names
-# @keyword manip
+# @keyword internal
 check_formula <- function(formula, varnames) {
-	if (!("formula" %in% class(formula))) stop("First argument must be a formula")
-	#if (length(formula) != 3)  stop("Formula must be of form row vars ~ col vars")
-	vars <- all.vars(formula) 
+	vars <- unlist(all.vars.character(formula))
 	if (!all(vars %in% c(".", "...","result_variable",varnames))) stop("Formula contains variables not in list of known variables")
+	vars <- vars[vars != "."]
 	if (length(unique(vars)) < length(vars)) stop("Variable names repeated")
 }
 
@@ -293,7 +283,7 @@ merge_all <- function(dfs, ...) {
 #
 # @arguments list of data frames to merge
 # @seealso \code{\link{merge_all}}
-# @keyword manip
+# @keyword internal
 merge_recurse <- function(dfs, ...) {
 	if (length(dfs) == 2) {
 		merge(dfs[[1]], dfs[[2]], all=TRUE, sort=FALSE, ...)

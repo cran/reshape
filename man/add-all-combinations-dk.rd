@@ -4,17 +4,16 @@
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-Add all combinations of the given rows and columsn to the data frames.
+Add all combinations of the given rows and columns to the data frames.
 }
-\usage{add.all.combinations(data, rows, cols)}
+\usage{add.all.combinations(data, vars = list(NULL, NULL))}
 \arguments{
 \item{data}{data.frame}
-\item{rows}{row variables (character vector)}
-\item{cols}{column variables (character vector)}
+\item{vars}{variables (list of character vectors)}
 }
 
 \details{This function is used to ensure that we have a matrix of the appropriate
 dimensionaliy with no missing cells.}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

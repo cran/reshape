@@ -14,4 +14,4 @@ Clean variable list for reshaping.
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

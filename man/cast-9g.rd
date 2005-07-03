@@ -45,7 +45,7 @@ for details of the implementation}
 \seealso{\code{\link{reshape1}}, \url{http://had.co.nz/reshape/}}
 \examples{#Air quality example
 names(airquality) <- tolower(names(airquality))
-airquality.d <- melt(airquality, id=c("month", "day"))
+airquality.d <- melt(airquality, id=c("month", "day"), preserve.na=FALSE)
 
 cast(airquality.d, month ~ variable, mean)
 cast(airquality.d, month ~ variable, mean, margins=c("grand_row", "grand_col"))
@@ -55,7 +55,7 @@ cast(airquality.d, month ~ variable + result_variable, range)
 
 #Chick weight example
 names(ChickWeight) <- tolower(names(ChickWeight))
-chick.d <- melt(ChickWeight, id=2:4)
+chick.d <- melt(ChickWeight, id=2:4, preserve.na = FALSE)
 
 cast(chick.d, time ~ variable, mean) # average effect of time
 cast(chick.d, diet ~ variable, mean) # average effect of diet
@@ -77,6 +77,6 @@ cast(ff_d, subject ~ time, length)
 cast(ff_d, subject ~ time, function(x) 30 - length(x))
 cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
 cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
-cast(ff_d, treatment + subject ~ variable, mean, margins="treatment", subset=subject < 5)
+cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")}
 \keyword{manip}

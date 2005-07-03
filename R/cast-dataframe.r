@@ -3,7 +3,7 @@
 # @argument Reshaped data frame
 # @argument Argument required to match generic
 # @argument Argument required to match generic
-# @keyword manip
+# @keyword internal
 print.cast_df <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
 	unx <- x
 	class(unx) <- "data.frame"
@@ -40,7 +40,7 @@ print.cast_df <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
 # @arguments column indices
 # @arguments other arguments
 # @arguments discard extra dimensions?
-# @keyword manip 
+# @keyword internal
 "[.cast_df" <- function(x, i=1:nrow(x), j=1:ncol(x), ..., drop = FALSE) {
 	unx <- x
 	class(unx) <- "data.frame"
@@ -53,7 +53,7 @@ print.cast_df <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
 # 
 # @arguments data.frame to modify
 # @value character matrix
-# @keyword manip 
+# @keyword internal
 strip.dups <- function(df) {
 	clear.dup <- function(dups,ret=dups) ifelse(duplicated(dups), "", ret)
 
@@ -66,7 +66,7 @@ strip.dups <- function(df) {
 # Convert cast data frame into a matrix
 #
 # @arguments Reshape data frame
-# @keyword manip
+# @keyword internal
 as.matrix.cast_df <- function(x) {
 	m <- as.matrix.data.frame(x[, -(1:(ncol(rrownames(x)))), drop=FALSE])
 	rdimnames(m) <- rdimnames(x)

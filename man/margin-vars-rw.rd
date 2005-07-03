@@ -16,4 +16,4 @@ Works out list of variables to margin over to get desired margins.
 \details{Variables that can't be margined over are dropped silently.}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

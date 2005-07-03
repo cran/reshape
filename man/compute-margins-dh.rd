@@ -17,4 +17,4 @@ Compute marginal values.
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

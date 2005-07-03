@@ -1,4 +1,4 @@
-This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2006.2.24)  6 APR 2006 10:50
+This is pdfeTeX, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2006.2.24)  22 JUN 2006 14:11
 entering extended mode
 **\nonstopmode \input /Users/hadley/Documents/reshape/reshape/inst/doc/introduc
 tion.tex
@@ -141,28 +141,6 @@ urces/share/texmf/Sweave',
                but the package provides `Sweave'.
 
 Package: Sweave 
-(/opt/local/share/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2004/02/22 v1.99f Standard LaTeX package
-
-(/opt/local/share/texmf-dist/tex/latex/base/t1enc.def
-File: t1enc.def 2004/02/22 v1.99f Standard LaTeX file
-LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
-))
-(/opt/local/share/texmf-dist/tex/latex/ae/ae.sty
-Package: ae 2001/02/12 1.3 Almost European Computer Modern
-
-(/opt/local/share/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2004/02/22 v1.99f Standard LaTeX package
-
-(/opt/local/share/texmf-dist/tex/latex/base/t1enc.def
-File: t1enc.def 2004/02/22 v1.99f Standard LaTeX file
-LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
-)
-LaTeX Font Info:    Try loading font information for T1+aer on input line 100.
-
-(/opt/local/share/texmf-dist/tex/latex/ae/t1aer.fd
-File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
-)))
 (/opt/local/share/texmf-dist/tex/latex/fancyvrb/fancyvrb.sty
 Package: fancyvrb 1998/07/17
 
@@ -245,7 +223,29 @@ Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 323.
 Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 324.
 Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 325.
 Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 326.
-))) (./introduction.aux)
+))
+(/opt/local/share/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2004/02/22 v1.99f Standard LaTeX package
+
+(/opt/local/share/texmf-dist/tex/latex/base/t1enc.def
+File: t1enc.def 2004/02/22 v1.99f Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
+))
+(/opt/local/share/texmf-dist/tex/latex/ae/ae.sty
+Package: ae 2001/02/12 1.3 Almost European Computer Modern
+
+(/opt/local/share/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2004/02/22 v1.99f Standard LaTeX package
+
+(/opt/local/share/texmf-dist/tex/latex/base/t1enc.def
+File: t1enc.def 2004/02/22 v1.99f Standard LaTeX file
+LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
+)
+LaTeX Font Info:    Try loading font information for T1+aer on input line 100.
+
+(/opt/local/share/texmf-dist/tex/latex/ae/t1aer.fd
+File: t1aer.fd 1997/11/16 Font definitions for T1/aer.
+)))) (./introduction.aux)
 \openout1 = `introduction.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 13.
@@ -264,6 +264,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 13.
 LaTeX Font Info:    ... okay on input line 13.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 13.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 13.
+
 (/opt/local/share/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
@@ -388,13 +389,13 @@ File: introductionw.pdf Graphic file (type pdf)
 <use introductionw.pdf, page 6> [6 <./introductionw.pdf>] (./introduction.aux) 
 ) 
 Here is how much of TeX's memory you used:
- 4297 strings out of 94500
- 61314 string characters out of 1174973
- 107497 words of memory out of 1000000
- 7408 multiletter control sequences out of 10000+50000
+ 4301 strings out of 94500
+ 61359 string characters out of 1174973
+ 107550 words of memory out of 1000000
+ 7412 multiletter control sequences out of 10000+50000
  8436 words of font info for 25 fonts, out of 500000 for 2000
  580 hyphenation exceptions out of 1000
- 35i,16n,41p,298b,400s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 35i,16n,41p,297b,400s stack positions out of 1500i,500n,5000p,200000b,5000s
 PDF statistics:
  121 PDF objects out of 300000
  7 named destinations out of 131072
@@ -407,4 +408,4 @@ opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmr9.pfb></opt/local/share/te
 xmf-dist/fonts/type1/bluesky/cm/cmbx9.pfb></opt/local/share/texmf-dist/fonts/ty
 pe1/bluesky/cm/cmr12.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cm
 tt12.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmr17.pfb>
-Output written on introduction.pdf (6 pages, 196162 bytes).
+Output written on introduction.pdf (6 pages, 196159 bytes).

@@ -4,7 +4,7 @@
 # @arguments matrix to turn into cast matrix
 # @arguments list of dimension names (as data.frames), row, col, ...
 # @value object of type \code{\link{cast_matrix}}
-# @keyword manip 
+# @keyword internal
 cast_matrix <- function(m, dimnames) {
 	rdimnames(m) <- dimnames
 	class(m) <- c("cast_matrix", class(m))
@@ -20,7 +20,7 @@ cast_matrix <- function(m, dimnames) {
 # @alias rcolnames<- 
 # @alias rrownames 
 # @alias rrownames<- 
-# @keyword manip 
+# @keyword internal
 rdimnames <- function(x) attr(x, "rdimnames")
 "rdimnames<-" <- function(x, value) {
 	attr(x, "rdimnames") <- value
@@ -47,7 +47,7 @@ rrownames <- function(x) rdimnames(x)[[1]]
 # @arguments reshaped matrix
 # @arguments number of digits to show
 # @arguments other arguments to match generic
-# @keyword manip
+# @keyword internal
 print.cast_matrix <- function(x, digits=getOption("digits"), ...) {
 	print(as.data.frame(x), digits=digits, ..., colnames=FALSE)
 }
@@ -58,7 +58,7 @@ print.cast_matrix <- function(x, digits=getOption("digits"), ...) {
 # @argument Reshape matrix
 # @argument Argument required to match generic
 # @argument Argument required to match generic
-# @keyword manip
+# @keyword internal
 as.data.frame.cast_matrix <- function(x, row.names, optional) {
 	unx <- unclass(x)
 	colnames(unx) <- gsub("NA", ".", apply(rcolnames(x), 1, paste, collapse="_"))
@@ -78,7 +78,7 @@ as.data.frame.cast_matrix <- function(x, row.names, optional) {
 # @arguments col indices
 # @arguments other arguments not used
 # @arguments discard extra dimensions?
-# @keyword manip 
+# @keyword internal
 "[.cast_matrix" <- function(x, i=1:nrow(x), j=1:ncol(x), ..., drop=FALSE) {
 	unx <- unclass(x)
 	cast_matrix(unx[i, j, ..., drop=FALSE], list(rrownames(x)[i, , drop=FALSE], rcolnames(x)[j,, drop=FALSE]))

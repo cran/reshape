@@ -15,7 +15,7 @@
 # @keyword manip
 # @seealso \url{http://had.co.nz/reshape/}
 recast <- function(data, formula, ..., id.var, measure.var) {
-	var <- cast_parse_formula(formula, names(data))
+	var <- cast_parse_formula(deparse(substitute(formula)), names(data))
 
 	molten <- melt(data, id.var, measure.var)
 	cast(molten, formula, ...)

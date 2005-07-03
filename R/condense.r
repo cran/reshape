@@ -59,7 +59,7 @@ expand <- function(data) {
 #
 # @arguments vector of variable names
 # @value Vector of "real" variable names (excluding result\_variable etc.)
-# @keyword manip
+# @keyword internal
 clean.vars <- function(vars) {vars[vars != "result_variable"]}
 
 # Margin variables
@@ -70,7 +70,7 @@ clean.vars <- function(vars) {vars[vars != "result_variable"]}
 # @arguments column variables
 # @arguments row variables
 # @arguments vector of variable names to margin over.
-# @keyword manip
+# @keyword internal
 margin.vars <- function(rows = NULL, cols = NULL, margins = NULL) {
 	if (missing(margins) || is.null(margins)) return(NULL)
 	

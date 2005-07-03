@@ -1,10 +1,10 @@
 \name{check_formula}
 \alias{check_formula}
-\title{Checks that formula is a valid reshaping formula.}
+\title{Check formula}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-
+Checks that formula is a valid reshaping formula.
 }
 \usage{check_formula(formula, varnames)}
 \arguments{
@@ -15,4 +15,4 @@
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

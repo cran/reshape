@@ -18,4 +18,4 @@ Subset a cast data frame. This will result in a normal dataframe, because it is
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

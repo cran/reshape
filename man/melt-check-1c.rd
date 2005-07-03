@@ -24,4 +24,4 @@ melt will assume integer and factor  variables are id variables,
 and all other are measured.}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

@@ -17,4 +17,4 @@
 \details{}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

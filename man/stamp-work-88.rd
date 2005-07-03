@@ -6,11 +6,10 @@
 \description{
 This is the workhouse that powers the stamp function.
 }
-\usage{stamp.work(data, rows = NULL, cols = NULL, fun, margins=NULL, ...)}
+\usage{stamp.work(data, vars=list(NULL, NULL), fun, margins=NULL, ...)}
 \arguments{
 \item{data}{data frame}
-\item{rows}{row variables (character vector)}
-\item{cols}{column variables (character vector)}
+\item{vars}{variables (list of character vectors)}
 \item{fun}{stamping function, should take a dataframe as it's first arugment}
 \item{margins}{variables to margin over (character vector, or TRUE, for all margins)}
 \item{...}{arguments passed to stamping function}
@@ -20,4 +19,4 @@ This is the workhouse that powers the stamp function.
 instead.}
 
 \examples{}
-\keyword{manip}
+\keyword{internal}

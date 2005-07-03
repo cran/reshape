@@ -43,6 +43,8 @@ melt <- function(data, id.var, measure.var, variable_name = "variable", preserve
 		df$value <- (data[,x]) #as.list
 		df
 	}))
+
+	df[[variable_name]] <- factor(df[[variable_name]], unique(df[[variable_name]]))	
 	remove.na(df)
 }
 
@@ -56,7 +58,7 @@ melt <- function(data, id.var, measure.var, variable_name = "variable", preserve
 # melt will assume integer and factor  variables are id variables, 
 # and all other are measured. 
 #
-# @keyword manip
+# @keyword internal
 # @arguments data frame
 # @arguments Vector of identifying variable names or indexes
 # @arguments Vector of Measured variable names or indexes
