@@ -6,13 +6,13 @@
 \description{
 Melt a data frame into form suitable for easy casting.
 }
-\usage{melt(data, id.var, measure.var, variable_name = "variable", preserve.na = FALSE)}
+\usage{melt(data, id.var, measure.var, variable_name = "variable", preserve.na = TRUE)}
 \arguments{
 \item{data}{Data set to melt}
 \item{id.var}{Identifying variables. If blank, will use all non measure.var variables}
 \item{measure.var}{Measured variables. If blank, will use all non id.var variables}
-\item{variable_name}{Should NAs be preserved or dropped from the data set?}
-\item{preserve.na}{}
+\item{variable_name}{Name of the variable that will store the names of the original variables}
+\item{preserve.na}{Should NAs be preserved or dropped from the data set?}
 }
 \value{molten data}
 \details{Along with \link{cast} and \link{recast}, melt is the only function from this package

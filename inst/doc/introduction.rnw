@@ -1,0 +1,15 @@
+\documentclass[a4paper]{article}
+%\VignetteIndexEntry{Introduction to reshaping data with reshape}
+
+\usepackage{hyperref}
+\usepackage{pdfpages}
+
+\title{Introduction to Reshaping Data with \texttt{reshape}}
+\author{Hadley Wickham. http://had.co.nz/reshape}
+
+\date{2006-08-25}
+
+\begin{document}
+\includepdf[fitpaper=true,pages=-]{introductionw.pdf}
+
+\end{document}

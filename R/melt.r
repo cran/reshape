@@ -16,6 +16,7 @@
 # @arguments Data set to melt
 # @arguments Identifying variables. If blank, will use all non measure.var variables
 # @arguments Measured variables. If blank, will use all non id.var variables
+# @arguments Name of the variable that will store the names of the original variables
 # @arguments Should NAs be preserved or dropped from the data set?
 # @value molten data
 # @keyword manip
@@ -27,7 +28,7 @@
 #X head(airquality.d)
 #X names(ChickWeight) <- tolower(names(ChickWeight))
 #X chick.d <- melt(ChickWeight, id=2:4)
-melt <- function(data, id.var, measure.var, variable_name = "variable", preserve.na = FALSE) {
+melt <- function(data, id.var, measure.var, variable_name = "variable", preserve.na = TRUE) {
 	remove.na <- function(df) if (preserve.na) df else df[complete.cases(df),,drop=FALSE]
 
 	var <- melt.check(data, id.var, measure.var)

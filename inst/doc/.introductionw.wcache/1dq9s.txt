@@ -1,0 +1,18 @@
+% latex table generated in R 2.2.0 by xtable 1.3-0 package
+% Sat Feb 25 11:04:30 2006
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rlllrrrrrr}
+\hline
+ & time & treatment & subject & rep & potato & buttery & grassy & rancid & painty \\
+\hline
+61 & 1 & 1 & 3 & 1.00 & 2.90 & 0.00 & 0.00 & 0.00 & 5.50 \\
+25 & 1 & 1 & 3 & 2.00 & 14.00 & 0.00 & 0.00 & 1.10 & 0.00 \\
+62 & 1 & 1 & 10 & 1.00 & 11.00 & 6.40 & 0.00 & 0.00 & 0.00 \\
+26 & 1 & 1 & 10 & 2.00 & 9.90 & 5.90 & 2.90 & 2.20 & 0.00 \\
+63 & 1 & 1 & 15 & 1.00 & 1.20 & 0.10 & 0.00 & 1.10 & 5.10 \\
+27 & 1 & 1 & 15 & 2.00 & 8.80 & 3.00 & 3.60 & 1.50 & 2.30 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
