@@ -8,7 +8,7 @@
 }
 \usage{as.matrix.cast_df(x)}
 \arguments{
-\item{x}{}
+\item{x}{Reshape data frame}
 }
 
 \details{}

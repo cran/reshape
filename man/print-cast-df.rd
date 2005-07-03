@@ -6,11 +6,12 @@
 \description{
 
 }
-\usage{print.cast_df(x, digits=getOption("digits"), ...)}
+\usage{print.cast_df(x, digits=getOption("digits"), ..., colnames=TRUE)}
 \arguments{
 \item{x}{}
 \item{digits}{}
 \item{...}{}
+\item{colnames}{}
 }
 
 \details{}

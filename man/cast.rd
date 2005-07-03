@@ -50,6 +50,8 @@ airquality.d <- melt(airquality, id=c("month", "day"))
 cast(airquality.d, month ~ variable, mean)
 cast(airquality.d, month ~ variable, mean, margins=c("grand_row", "grand_col"))
 cast(airquality.d, day ~ month, mean, subset=variable=="ozone")
+cast(airquality.d, month ~ variable, range)
+cast(airquality.d, month ~ variable + result_variable, range)
 
 #Chick weight example
 names(ChickWeight) <- tolower(names(ChickWeight))
@@ -76,5 +78,5 @@ cast(ff_d, subject ~ time, function(x) 30 - length(x))
 cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
 cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 cast(ff_d, treatment + subject ~ variable, mean, margins="treatment", subset=subject < 5)
-library(lattice); xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")}
+lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")}
 \keyword{manip}

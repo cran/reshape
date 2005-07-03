@@ -17,18 +17,19 @@ condense <- function(data, variables, fun, ...) {
 		df$results <- list(fun(data$value, ...))
 		return(df)
 	}
-	cols <- unique(data[,variables, drop=FALSE])
-	cols$index <- 1:nrow(cols)
 
-	# this is rather slow
-	index <- merge(cols, data[,variables, drop=FALSE], sort=FALSE)$index
-	results <- lapply(split(data$value, index), fun, ...)
+	sorted <- sort.df(data, variables)[,c(variables, "value"), drop=FALSE]
+	duplicates <- duplicated(sorted[,variables, drop=FALSE])
+	index <- cumsum(!duplicates)
+
+	results <- tapply(sorted$value, index, fun, ..., simplify = FALSE)
+
+	cols <- sorted[!duplicates,variables, drop=FALSE]
 	cols$results <- array(results)
-	cols$index <- NULL
 	cols
 }
 
-# Expand
+# expand
 # Expand out condensed data frame.
 #
 # If aggregating function supplied to condense returns multiple values, this
@@ -71,7 +72,7 @@ clean.vars <- function(vars) {vars[vars != "result_variable"]}
 # @arguments vector of variable names to margin over.
 # @keyword manip
 margin.vars <- function(rows = NULL, cols = NULL, margins = NULL) {
-	if (missing(margins) || is.null(margins)) return(numeric(0))
+	if (missing(margins) || is.null(margins)) return(NULL)
 	
 	# Nothing to margin over for last variable in column or row
 	row.margins <- intersect(rows[-length(rows)], margins)
@@ -86,30 +87,33 @@ margin.vars <- function(rows = NULL, cols = NULL, margins = NULL) {
 		}), recursive = FALSE)
 	}
 	
-	margins.all <- c(margin.intersect(cols, col.margins, rows, row.margins),  margin.intersect(rows, row.margins, cols, col.margins))
+	margins.all <- c(
+		margin.intersect(cols, col.margins, rows, row.margins),  
+		margin.intersect(rows, row.margins, cols, col.margins)
+	)
 	
 	if (grand.row) margins.all <- c(margins.all, list(cols))
 	if (grand.col)	margins.all <- c(margins.all, list(rows))
 	if (grand.col && grand.row) margins.all <- c(margins.all, list(numeric(0)))
 	
-	duplicates <- duplicated(lapply(lapply(margins.all,sort), paste, collapse=""))
+	duplicates <- duplicated(lapply(lapply(margins.all,function(x) if(!is.null(x)) sort(x)), paste, collapse=""))
 	
 	margins.all[!duplicates]
 }
 
-# Expand grid
-# Expand grid of data frames
+# expand grid
+# expand grid of data frames
 #
 # Creates new data frame containing all combination of rows from df1 and df2.
 #
 # @arguments data frame 1 (varies fastest)
 # @arguments data frame 2
 # @keyword manip
-expand.grid.df <- function(df1, df2) {
-	u1 <- unique(df1)
+expand.grid.df <- function(df1, df2, unique=TRUE) {
+	u1 <- if (unique) unique(df1) else df1
 	index1 <- 1:nrow(u1)
 
-	u2 <- unique(df2)
+	u2 <- if (unique) unique(df2) else df2
 	index2 <- 1:nrow(u2)
 
 	if (ncol(df1) == 0) return(u2)
@@ -129,9 +133,12 @@ expand.grid.df <- function(df1, df2) {
 # @keyword manip
 rbind.fill <- function(...) {
 	dfs <- list(...)
+	if (length(dfs) == 0) return(list())
+
 	all.names <- unique(unlist(lapply(dfs, names)))
 	do.call("rbind", lapply(dfs, function(df) {
-		missing.vars <- setdiff(all.names, names(df))
+		if (length(df) == 0 || nrow(df) == 0) return(df)
+ 		missing.vars <- setdiff(all.names, names(df))
 		if (length(missing.vars) > 0) df[, missing.vars] <- NA
 		df
 	}))

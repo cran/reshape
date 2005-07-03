@@ -1,6 +1,6 @@
 \name{expand}
 \alias{expand}
-\title{Expand}
+\title{expand}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
