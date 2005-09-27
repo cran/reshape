@@ -11,25 +11,26 @@
 # @arguments aggregating function, may multiple values
 # @arguments further arguments passed on to aggregating function
 # @keyword manip
+# @keyword internal
 condense <- function(data, variables, fun, ...) {
 	if (length(variables) == 0 ) {
-		df <- data.frame(results = 0)
-		df$results <- list(fun(data$value, ...))
+		df <- data.frame(result = 0)
+		df$result <- list(fun(data$value, ...))
 		return(df)
 	}
 
-	sorted <- sort.df(data, variables)[,c(variables, "value"), drop=FALSE]
+	sorted <- sort_df(data, variables)[,c(variables, "value"), drop=FALSE]
 	duplicates <- duplicated(sorted[,variables, drop=FALSE])
 	index <- cumsum(!duplicates)
 
 	results <- tapply(sorted$value, index, fun, ..., simplify = FALSE)
 
 	cols <- sorted[!duplicates,variables, drop=FALSE]
-	cols$results <- array(results)
+	cols$result <- array(results)
 	cols
 }
 
-# expand
+# Expand
 # Expand out condensed data frame.
 #
 # If aggregating function supplied to condense returns multiple values, this
@@ -40,12 +41,13 @@ condense <- function(data, variables, fun, ...) {
 #
 # @arguments condensed data frame
 # @keyword manip
+# @keyword internal
 expand <- function(data) {
-	lengths <- unique(sapply(data$results, length))
+	lengths <- unique(sapply(data$result, length))
 	if (lengths == 1) return(data)
 
-	first <- data[1, "results"][[1]]
-	exp <- lapply(1:length(first), function(x) as.vector(unlist(lapply(data$results, "[", x))))
+	first <- data[1, "result"][[1]]
+	exp <- lapply(1:length(first), function(x) as.vector(unlist(lapply(data$result, "[", x))))
 	names(exp) <- if (is.null(names(first))) make.names(1:length(first)) else make.names(names(first))
 
 	x <- melt(data.frame(data[, 1:(ncol(data)-1), drop=FALSE], exp), m=names(exp),variable_name="result_variable", preserve.na = TRUE)

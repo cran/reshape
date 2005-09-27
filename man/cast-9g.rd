@@ -6,7 +6,7 @@
 \description{
 Cast a molten data frame into the reshaped or aggregated form you want
 }
-\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE)}
+\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA)}
 \arguments{
 \item{data}{molten data frame, see \code{\link{melt}}}
 \item{formula}{casting formula, see details for specifics}
@@ -14,7 +14,8 @@ Cast a molten data frame into the reshaped or aggregated form you want
 \item{...}{further arguments are passed to aggregating function}
 \item{margins}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
 \item{subset}{logical vector to subset data set with before reshaping}
-\item{df}{}
+\item{df}{value with which to fill in structural missings}
+\item{fill}{}
 }
 
 \details{Along with \code{\link{melt}}  and \link{recast}, this is the only function you should ever need to use.
@@ -83,8 +84,10 @@ cast(melt(tips), sex ~ smoker | variable, mean)
 
 ff_d <- melt(french_fries, id=1:4, preserve.na=FALSE)
 cast(ff_d, subject ~ time, length)
+cast(ff_d, subject ~ time, length, fill=0)
 cast(ff_d, subject ~ time, function(x) 30 - length(x))
-cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
+cast(ff_d, subject ~ time, function(x) 30 - length(x), fill=30)
+cast(ff_d, variable ~ ., c(min, max))
 cast(ff_d, variable ~ ., function(x) quantile(x,c(0.25,0.5)))
 cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")

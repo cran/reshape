@@ -9,6 +9,39 @@
 melt <- function(data, ...) 
   UseMethod("melt", data)
 
+# Default melt function
+#
+# @keyword internal
+melt.default <- function(data, ...) {
+  data.frame(value=data)
+}
+
+# Melt a list
+#
+# @keyword internal
+#X a <- as.list(1:4)
+#X melt(a)
+#X names(a) <- letters[1:4]
+#X melt(a)
+#X attr(a, "varname") <- "ID"
+#X melt(a)
+#X a <- list(matrix(1:4, ncol=2), matrix(1:6, ncol=2))
+#X melt(a)
+#X a <- list(matrix(1:4, ncol=2), array(1:27, c(3,3,3)))
+#X melt(a)
+#X melt(list(1:5, matrix(1:4, ncol=2)))
+#X melt(list(list(1:3), 1, list(as.list(3:4), as.list(1:2))))
+melt.list <- function(data, ..., level=1) {
+  var <- nulldefault(attr(data, "varname"), paste("L", level, sep=""))
+  names <- nulldefault(names(data), 1:length(data))
+  parts <- lapply(data, melt, level=level+1)
+  
+  namedparts <- mapply(function(x, name) {
+   x[[var]] <- name
+   x 
+  }, parts, names, SIMPLIFY=FALSE)
+  do.call(rbind.fill, namedparts)
+}
 
 # Melt
 # Melt a data frame into form suitable for easy casting.
@@ -53,7 +86,9 @@ melt.data.frame <- function(data, id.var, measure.var, variable_name = "variable
 	}))
 
 	df[[variable_name]] <- factor(df[[variable_name]], unique(df[[variable_name]]))	
-	remove.na(df)
+	df <- remove.na(df)
+	rownames(df) <- 1:nrow(df)
+	df
 }
 
 # Melt an array
@@ -62,14 +97,17 @@ melt.data.frame <- function(data, id.var, measure.var, variable_name = "variable
 # @arguments array to melt
 # @arguments variable names to use in molten data.frame
 # @keyword manip
+# @alias melt.matrix
+# @alias melt.table
 #X a <- array(1:24, c(2,3,4))
 #X melt(a)
 #X melt(a, varnames=c("X","Y","Z"))
 #X dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
 #X melt(a)
 #X melt(a, varnames=c("X","Y","Z"))
-melt.array <- function(data, varnames = paste("V", 1:length(dim(data)), sep=""), ...) {
+melt.array <- function(data, varnames = names(dimnames(data)), ...) {
   values <- as.vector(data)
+	#paste("V", 1:length(dim(data)), sep="")
   
   if (is.null(dimnames(data))) {
     indicies <- do.call(expand.grid, lapply(dim(data), function(x) 1:x))
@@ -80,24 +118,35 @@ melt.array <- function(data, varnames = paste("V", 1:length(dim(data)), sep=""),
   data.frame(indicies, value=values)
 }
 
+melt.table <- melt.array
+melt.matrix <- melt.array
+
 # Melt cast data.frames
 # After casting into a particular form, it can sometimes be useful to 
 # 
 # @keyword internal
-melt.cast_df <- function(data, ...) {
-  molten <- melt(as.data.frame(data), ...)
-  names(molten)[-ncol(molten)] <- sapply(rdimnames(data), function(x) paste(names(x), sep="_"))
-  molten
+melt.cast_df <- function(data, drop.margins=TRUE, ...) {
+  molten <- melt.data.frame(as.data.frame(data), id=attr(data, "idvars"))
   
+  cols <- rcolnames(data)
+  rownames(cols) <- make.names(rownames(cols))
+
+  molten <- cbind(molten[names(molten) != "variable"], cols[molten$variable, , drop=FALSE])
+  
+  if (drop.margins) {
+      margins <- !complete.cases(molten[,names(molten) != "value", drop=FALSE])
+    molten <- molten[!margins, ]
+  }
+
+  molten
+
 }
 
 # Melt cast matrices
 # 
 # @keyword internal
 melt.cast_matrix <- function(data, ...) {
-  molten <- melt.array(data, ...)
-  names(molten)[-ncol(molten)] <- sapply(rdimnames(data), function(x) paste(names(x), sep="_"))
-  molten
+  melt(as.data.frame(data))
 }
 
 # Melt check.

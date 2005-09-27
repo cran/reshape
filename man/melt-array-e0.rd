@@ -1,16 +1,17 @@
 \name{melt.array}
 \alias{melt.array}
+\alias{melt.matrix}
+\alias{melt.table}
 \title{Melt an array}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
 This function melts a high-dimensional array into a form that you can use \code{\link{cast}} with.
 }
-\usage{melt.array(data, varnames = paste("V", 1:length(dim(data)), sep=""), ...)}
+\usage{melt.array(data, varnames = names(dimnames(data)), ...)}
 \arguments{
 \item{data}{array to melt}
 \item{varnames}{variable names to use in molten data.frame}
-\item{sep}{}
 \item{...}{}
 }
 

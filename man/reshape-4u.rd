@@ -6,14 +6,15 @@
 \description{
 Takes data frame and variable list and casts data.
 }
-\usage{reshape1(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, ...)}
+\usage{reshape1(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, fill=NA, ...)}
 \arguments{
 \item{data}{data frame}
 \item{vars}{variables to appear in columns}
 \item{fun.aggregate}{variables to appear in rows}
 \item{margins}{aggregation function}
 \item{df}{should the aggregating function be supplied with the entire data frame, or just the relevant entries from the values column}
-\item{...}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
+\item{fill}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
+\item{...}{value with which to fill in structural missings}
 \item{}{further arguments are passed to aggregating function}
 }
 

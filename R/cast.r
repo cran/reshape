@@ -38,6 +38,7 @@
 # @arguments further arguments are passed to aggregating function
 # @arguments vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins
 # @arguments logical vector to subset data set with before reshaping
+# @arguments value with which to fill in structural missings
 # @seealso \code{\link{reshape1}}, vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}
 #X #Air quality example
 #X names(airquality) <- tolower(names(airquality))
@@ -75,26 +76,31 @@
 #X 
 #X ff_d <- melt(french_fries, id=1:4, preserve.na=FALSE)
 #X cast(ff_d, subject ~ time, length)
+#X cast(ff_d, subject ~ time, length, fill=0)
 #X cast(ff_d, subject ~ time, function(x) 30 - length(x))
-#X cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
+#X cast(ff_d, subject ~ time, function(x) 30 - length(x), fill=30)
+#X cast(ff_d, variable ~ ., c(min, max))
 #X cast(ff_d, variable ~ ., function(x) quantile(x,c(0.25,0.5)))
 #X cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 #X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 #X lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")
-cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE) {
+cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA) {
   if (!is.character(formula)) formula <- deparse(substitute(formula))
 	subset <- eval(substitute(subset), data, parent.frame())  
-	data <- data[subset, ]  
+	data <- data[subset, , drop=FALSE]  
 	variables <- cast_parse_formula(formula, names(data))
+
+
+	if (length(fun.aggregate) > 1) fun.aggregate <- do.call(funstofun, as.list(match.call()[[4]])[-1])
 	
 	if (!is.null(variables$l)) {
 		res <- nested.by(data, data[variables$l], function(x) {
-			reshape1(x, variables$m, fun.aggregate, margins=margins, df=df, ...)
+			reshape1(x, variables$m, fun.aggregate, margins=margins, df=df, fill=fill, ...)
 		})	
 	} else {
-		res <- reshape1(data, variables$m, fun.aggregate, margins=margins, df=df, ...)
+		res <- reshape1(data, variables$m, fun.aggregate, margins=margins, df=df,fill=fill, ...)
 	}
-	attr(res, "formula") <- formula
+	#attr(res, "formula") <- formula
 	#attr(res, "data") <- deparse(substitute(data))
 	
 	res
@@ -109,6 +115,7 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 # @arguments aggregation function
 # @arguments should the aggregating function be supplied with the entire data frame, or just the relevant entries from the values column
 # @arguments vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins
+# @arguments value with which to fill in structural missings
 # @arguments further arguments are passed to aggregating function
 # @seealso \code{\link{cast}}
 # @keyword internal
@@ -149,10 +156,10 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 #X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_row"))
 #X 
 #X reshape1(airquality.d, list(c("month"), c("variable")), function(x) diff(range(x))) 
-reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, ...) {
+reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, fill=NA, ...) {
 	vars.clean <- lapply(vars, clean.vars)
 	variables <- unlist(vars.clean)
-
+	
 	if (!missing(margins) && isTRUE(margins)) margins <- c(variables, "grand_row", "grand_col")
 	
 	aggregate <- nrow(unique(data[,variables, drop=FALSE])) < nrow(data)
@@ -171,16 +178,19 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 			vars[[2]] <- c(vars[[2]], "result_variable")
 		}
 	} else {
-		data.r <- data.frame(data[,c(variables)], result = data$value)	
+		data.r <- data.frame(data[,c(variables), drop=FALSE], result = data$value)	
+		if (!is.null(fun.aggregate)) data.r$result <- sapply(data.r$result, fun.aggregate)
 	}
+
   
   if (length(vars.clean) > 2 && margins) {
     warning("Sorry, you currently can't use margins with high D arrays", .call=FALSE)
     margins <- FALSE
   }
 	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), fun.aggregate, ..., df=df)
-	result <- sort.df(rbind.fill(data.r, margins.r), unlist(vars))
-	result <- add.all.combinations(result, vars)
+	
+	result <- sort_df(rbind.fill(data.r, margins.r), unlist(vars))
+	result <- add.all.combinations(result, vars, fill=fill)
 
 	dimnames <- lapply(vars, function(x) dim.names(result, x))
 
@@ -188,7 +198,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 	reshaped <- array(r, rev(sapply(dimnames, nrow)))
   
   reshaped <- aperm(reshaped, length(dim(reshaped)):1)
-	dimnames(reshaped) <- lapply(dimnames, function(x) apply(x, 1, paste, collapse="-"))
+	#dimnames(reshaped) <- lapply(dimnames, function(x) apply(x, 1, paste, collapse="-"))
 	rownames(reshaped) <- 1:nrow(reshaped)
 	
 	if (length(vars.clean) > 2) return(reshaped)
@@ -205,95 +215,33 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 # 
 # @arguments data.frame
 # @arguments variables (list of character vectors)
+# @arguments value to fill structural missings with 
 # @keyword internal 
 #X rdunif <- 
 #X   function(n=20, min=0, max=10) floor(runif(n,min, max))
 #X df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif())
 #X add.all.combinations(df)
 #X add.all.combinations(df, list("a", "b"))
+#X add.all.combinations(df, list("a", "b"), fill=0)
 #X add.all.combinations(df, list(c("a", "b")))
 #X add.all.combinations(df, list("a", "b", "c"))
 #X add.all.combinations(df, list(c("a", "b"), "c"))
 #X add.all.combinations(df, list(c("a", "b", "c")))
-add.all.combinations <- function(data, vars = list(NULL)) {
+add.all.combinations <- function(data, vars = list(NULL), fill=NA) {
 	if (sum(sapply(vars, length)) == 0) return(data)
 
 	all.combinations <- do.call(expand.grid.df, 
 		lapply(vars, function(cols) data[, cols, drop=FALSE])
-	)
+	)	
 	result <- merge_recurse(list(data, all.combinations)) 
 	
-	sort.df(result, unlist(vars))
+	# fill missings with fill value
+	if (!is.na(fill)) result[is.na(result)] <- fill
+
+	sort_df(result, unlist(vars))
 }
 
 
-# Compute margins
-# Compute marginal values.
-# 
-# @arguments data frame
-# @arguments margins to compute
-# @arguments aggregation function
-# @arguments other argument passed to aggregation function
-# @keyword internal 
-compute.margins <- function(data, margins, fun.aggregate, ..., df=FALSE) {
-	if (length(margins) == 0) return(data.frame())
-	
-	if (missing(fun.aggregate)) {
-		warning("Margins require fun.aggregate: length used as default", call.=FALSE)
-		fun.aggregate <- length
-	}
-	exp <- function(x) {
-		if (df) {
-			condense.df(data, x, fun.aggregate, ...)
-		} else {
-			expand(condense(data, x, fun.aggregate, ...))
-		}
-	}
-	
-	do.call("rbind.fill",lapply(margins, exp))
-}
-
-
-# Margin variables
-# Works out list of variables to margin over to get desired margins.
-#
-# Variables that can't be margined over are dropped silently.
-#
-# @arguments column variables
-# @arguments row variables
-# @arguments vector of variable names to margin over.
-# @keyword internal
-margin.vars <- function(vars = list(NULL, NULL), margins = NULL) {
-	rows <- vars[[1]]
-	cols <- vars[[2]]
-	if (missing(margins) || is.null(margins)) return(NULL)
-	
-	# Nothing to margin over for last variable in column or row
-	row.margins <- intersect(rows[-length(rows)], margins)
-	col.margins <- intersect(cols[-length(cols)], margins)
-
-	grand.row <- "grand_row" %in% margins
-	grand.col <- "grand_col" %in% margins
-	
-	margin.intersect <- function(cols, col.margins, rows, row.margins) {
-		unlist(lapply(col.margins, function(col) {
-			c(lapply(row.margins, c, col), list(c(col, rows)))
-		}), recursive = FALSE)
-	}
-	
-	margins.all <- c(
-		margin.intersect(cols, col.margins, rows, row.margins),  
-		margin.intersect(rows, row.margins, cols, col.margins)
-	)
-
-	if (grand.row && !is.null(rows)) margins.all <- c(margins.all, list(cols), list(col.margins))
-	if (grand.col && !is.null(cols)) margins.all <- c(margins.all, list(rows), list(row.margins))
-	if (grand.col && grand.row  && !is.null(rows)  && !is.null(cols)) margins.all <- c(margins.all, list(numeric(0)))
-	
-	duplicates <- duplicated(lapply(lapply(margins.all,function(x) if(!is.null(x)) sort(x)), paste, collapse=""))
-	
-	margins.all[!duplicates]
-}
 
 # Dimension names
 # Convenience method for extracting row and column names 

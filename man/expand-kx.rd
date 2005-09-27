@@ -1,6 +1,6 @@
 \name{expand}
 \alias{expand}
-\title{expand}
+\title{Expand}
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
@@ -19,3 +19,4 @@ otherwise will be number X1, X2, ..., Xn etc.}
 
 \examples{}
 \keyword{manip}
+\keyword{internal}

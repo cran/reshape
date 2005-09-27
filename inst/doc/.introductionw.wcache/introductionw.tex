@@ -88,54 +88,129 @@ There are two ways to think about the results from an aggregation command, as ei
 
 \subsection{Example}
 
-<% library(reshape); data(french_fries); options(digits=3) %>
+
 The \texttt{reshape} package is available on CRAN and can be installed using the R command \texttt{install.packages("reshape")}.  This section will work through some techniques using the reshape package with an example data set (\texttt{french\_fries}).  The data is from a sensory experiment investigating the effect of different frying oils on the taste of french fries over time.  There are three different types of frying oils (treatment), each in two different fryers (rep), tested by 12 people (subject) on 10 different days (time).  The sensory attributes recorded, in order of desirability, are potato, buttery, grassy, rancid, painty flavours.  The first few rows of the data look like:
 
-<%=
-xtable(head(french_fries))
-%>
+% latex table generated in R 2.3.0 by xtable 1.3-0 package
+% Thu Jul 13 17:33:03 2006
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rlllrrrrrr}
+\hline
+ & time & treatment & subject & rep & potato & buttery & grassy & rancid & painty \\
+\hline
+61 & 1 & 1 & 3 & 1.00 & 2.90 & 0.00 & 0.00 & 0.00 & 5.50 \\
+25 & 1 & 1 & 3 & 2.00 & 14.00 & 0.00 & 0.00 & 1.10 & 0.00 \\
+62 & 1 & 1 & 10 & 1.00 & 11.00 & 6.40 & 0.00 & 0.00 & 0.00 \\
+26 & 1 & 1 & 10 & 2.00 & 9.90 & 5.90 & 2.90 & 2.20 & 0.00 \\
+63 & 1 & 1 & 15 & 1.00 & 1.20 & 0.10 & 0.00 & 1.10 & 5.10 \\
+27 & 1 & 1 & 15 & 2.00 & 8.80 & 3.00 & 3.60 & 1.50 & 2.30 \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
 
 One of the first things we might be interested in is how balanced this design is, and whether there are many different missing values.  We can investigate this using length as our aggregation function:
 
-<%=r
+\begin{verbatim}
 ff_d <- melt(french_fries, id=1:4)
 cast(ff_d, subject ~ time, length)
-%>
+
+                                      
+   time  1  2  3  4  5  6  7  8  9  10
+subject X1 X2 X3 X4 X5 X6 X7 X8 X9 X10
+      3 30 30 30 30 30 30 30 30 30  NA
+     10 30 30 30 30 30 30 30 30 30  30
+     15 30 30 30 30 30 30 30 30 30  30
+     16 30 30 30 30 30 30 30 30 30  30
+     19 30 30 30 30 30 30 30 30 30  30
+     31 30 30 30 30 30 30 30 30 NA  30
+     51 30 30 30 30 30 30 30 30 30  30
+     52 30 30 30 30 30 30 30 30 30  30
+     63 30 30 30 30 30 30 30 30 30  30
+     78 30 30 30 30 30 30 30 30 30  30
+     79 30 30 30 30 30 30 30 30 30  NA
+     86 30 30 30 30 30 30 30 30 NA  30
+\end{verbatim}
 
 Of course we can also create our own aggregation function.  Each subject should have had 30 observations at each time, so by displaying the difference we can more easily see where the data is missing.
 
-<%=r
+\begin{verbatim}
 cast(ff_d, subject ~ time, function(x) 30 - length(x))
-%>
+
+                                      
+   time  1  2  3  4  5  6  7  8  9  10
+subject X1 X2 X3 X4 X5 X6 X7 X8 X9 X10
+      3  0  0  0  0  0  0  0  0  0  NA
+     10  0  0  0  0  0  0  0  0  0   0
+     15  0  0  0  0  0  0  0  0  0   0
+     16  0  0  0  0  0  0  0  0  0   0
+     19  0  0  0  0  0  0  0  0  0   0
+     31  0  0  0  0  0  0  0  0 NA   0
+     51  0  0  0  0  0  0  0  0  0   0
+     52  0  0  0  0  0  0  0  0  0   0
+     63  0  0  0  0  0  0  0  0  0   0
+     78  0  0  0  0  0  0  0  0  0   0
+     79  0  0  0  0  0  0  0  0  0  NA
+     86  0  0  0  0  0  0  0  0 NA   0
+\end{verbatim}
 
 We can also easily see the range of values that each variable takes:
 
-<%=r
+\begin{verbatim}
 cast(ff_d, variable ~ ., function(x) c(min=min(x), max=max(x)))
-%>
+
+                       
+result_variable min max
+       variable min max
+         potato  NA  NA
+        buttery  NA  NA
+         grassy  NA  NA
+         rancid  NA  NA
+         painty  NA  NA
+\end{verbatim}
 
 Since the data is fairly well balanced, we can do some (crude) investigation as to the effects of the different treatments.  For example, we can calculate the overall means for each sensory attribute for each treatment:
 
-<%=r
+\begin{verbatim}
 cast(ff_d, treatment ~ variable, mean, 
-	margins=c("grand_col", "grand_row")) 
-%>
+margins=c("grand_col", "grand_row"))
+
+                                                
+ variable potato buttery grassy rancid painty  .
+treatment potato buttery grassy rancid painty  .
+        1   6.89      NA  0.649   4.07   2.58 NA
+        2   7.00      NA  0.663   3.62     NA NA
+        3     NA      NA     NA     NA     NA NA
+        .     NA      NA     NA     NA     NA NA
+\end{verbatim}
 
 Note the row and column margins.  We can also produce margins at different levels.  The following example shows the results broken down for subjects 3 and 11, with both overall means and means for each subject:
 
-<%=r
+\begin{verbatim}
 cast(ff_d, treatment + subject ~ variable, mean, 
-	margins="treatment", subset=subject %in% c(3,10))
-%>
+margins="treatment", subset=subject %in% c(3,10))
+
+                                                      
+          variable potato buttery grassy rancid painty
+treatment  subject potato buttery grassy rancid painty
+        1        3   6.22   0.372 0.1889   2.11   3.11
+                10   9.96   6.750 0.5850   4.02   1.38
+                 .   8.18   3.729 0.3974   3.11   2.20
+        2        3   6.74   0.589 0.1056   3.14   2.48
+                10   9.99   6.980 0.4750   2.15   0.82
+                 .   8.45   3.953 0.3000   2.62   1.61
+        3        3   5.29   0.767 0.0944   2.86   2.87
+                10  10.03   6.450 0.1450   3.11   0.69
+                 .   7.79   3.758 0.1211   2.99   1.72
+\end{verbatim}
 
 Finally, since we have a repetition over treatments, we might be interested in how reliable each subject is: are the scores for the two reps highly correlated?  We can explore this graphically by reshaping the data and using a lattice plot.  Our graphical tools work best when the things we want to compare are in different columns, so we'll cast the data to have a column for each rep.
 
 \texttt{xyplot(X1 ~ X2 | variable, cast(ff\_d, ... ~ rep), aspect="iso")}
 
-<%=g
-library(lattice)
-xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")
-%>
+\includegraphics{.introductionw.wcache/1doja.pdf}
 
 If we wanted to explore the relationships between subjects or times or treatments we could follow similar steps.
 

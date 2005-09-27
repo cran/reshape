@@ -6,10 +6,11 @@
 \description{
 Add all combinations of the given rows and columns to the data frames.
 }
-\usage{add.all.combinations(data, vars = list(NULL))}
+\usage{add.all.combinations(data, vars = list(NULL), fill=NA)}
 \arguments{
 \item{data}{data.frame}
 \item{vars}{variables (list of character vectors)}
+\item{fill}{value to fill structural missings with}
 }
 
 \details{This function is used to ensure that we have a matrix of the appropriate
@@ -20,6 +21,7 @@ function(n=20, min=0, max=10) floor(runif(n,min, max))
 df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif())
 add.all.combinations(df)
 add.all.combinations(df, list("a", "b"))
+add.all.combinations(df, list("a", "b"), fill=0)
 add.all.combinations(df, list(c("a", "b")))
 add.all.combinations(df, list("a", "b", "c"))
 add.all.combinations(df, list(c("a", "b"), "c"))

@@ -6,9 +6,10 @@
 \description{
 After casting into a particular form, it can sometimes be useful to
 }
-\usage{melt.cast_df(data, ...)}
+\usage{melt.cast_df(data, drop.margins=TRUE, ...)}
 \arguments{
 \item{data}{}
+\item{drop.margins}{}
 \item{...}{}
 }
 

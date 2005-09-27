@@ -21,3 +21,4 @@ same number of arguments for all input.}
 
 \examples{}
 \keyword{manip}
+\keyword{internal}

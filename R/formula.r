@@ -16,9 +16,10 @@ cast_parse_formula <- function(formula = "...  ~ variable", varnames) {
 	
 	remainder <- varnames[!(varnames %in% c(unlist(vars), "value"))]
 	replace.remainder <- function(x) if (any(x == "..."))  c(x[x != "..."], remainder) else x
+	
 	list(
 		m = lapply(vars$m, replace.remainder),
-		l = replace.remainder(vars$l)
+		l = rev(replace.remainder(vars$l))
 	)
 }
 
@@ -35,6 +36,7 @@ cast_parse_formula <- function(formula = "...  ~ variable", varnames) {
 #X all.vars.character(". ~ a + b")
 #X all.vars.character("a ~ b | c + d + e")
 all.vars.character <- function(formula, blank.char = ".") {
+  formula <- paste(formula, collapse="")
 	vars <- function(x) {
 		if (is.na(x)) return(NULL)
 		remove.blank(strsplit(gsub("\\s+", "", x), "[*+]")[[1]])

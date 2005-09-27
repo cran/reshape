@@ -1,0 +1,7 @@
+                                                 
+  variable potato buttery grassy rancid painty  .
+ treatment potato buttery grassy rancid painty  .
+         1   6.89      NA  0.649   4.07   2.58 NA
+         2   7.00      NA  0.663   3.62     NA NA
+         3     NA      NA     NA     NA     NA NA
+         .     NA      NA     NA     NA     NA NA

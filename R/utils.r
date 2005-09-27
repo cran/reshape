@@ -66,12 +66,13 @@ rbind.fill <- function(...) {
 	if (length(dfs) == 0) return(list())
 
 	all.names <- unique(unlist(lapply(dfs, names)))
-	do.call("rbind", lapply(dfs, function(df) {
-		if (length(df) == 0 || nrow(df) == 0) return(df)
+	do.call("rbind", compact(lapply(dfs, function(df) {
+		if (length(df) == 0 || nrow(df) == 0) return(NULL)
+		
  		missing.vars <- setdiff(all.names, names(df))
 		if (length(missing.vars) > 0) df[, missing.vars] <- NA
 		df
-	}))
+	})))
 }
 
 # Compact list
@@ -101,7 +102,7 @@ defaults <- function(x, y)  {
 # @arguments variables to use for sorting
 # @returns sorted data frame
 # @keyword manip 
-sort.df <- function(data, vars=names(data)) {
+sort_df <- function(data, vars=names(data)) {
 	if (length(vars) == 0 || is.null(vars)) return(data)
 	data[do.call("order", data[,vars, drop=FALSE]), ,drop=FALSE]
 }
@@ -150,8 +151,17 @@ rename <- function(x, replace) {
 # @arguments number to round to
 # @arguments function to use for round (eg. \code{\link{floor}})
 # @keyword internal 
-round_any <- function(x, round, f=floor) {
-	f(x / round) * round
+#X round_any(135, 10)
+#X round_any(135, 100)
+#X round_any(135, 25)
+#X round_any(135, 10, floor)
+#X round_any(135, 100, floor)
+#X round_any(135, 25, floor)
+#X round_any(135, 10, ceiling)
+#X round_any(135, 100, ceiling)
+#X round_any(135, 25, ceiling)
+round_any <- function(x, accuracy, f=round) {
+	f(x / accuracy) * accuracy
 }
 
 
@@ -203,3 +213,48 @@ nested.by <- function(data, INDICES, FUN, ...) {
 }
 
 
+# Split a vector into multiple columns
+# This function can be used to split up a column that has been pasted together.
+# 
+# @arguments character vector or factor to split up
+# @arguments regular expression to split on
+# @arguments names for output columns
+# @keyword manip
+# @alias colsplit.factor
+# @alias colsplit.character
+colsplit <- function(x, split="", names) UseMethod("colsplit", x)
+colsplit.factor <- function(x, split="", names) colsplit(as.character(x), split, names)
+colsplit.character <- function(x, split="", names) {
+	vars <- as.data.frame(do.call(rbind, strsplit(x, split)))
+	names(vars) <- names
+	as.data.frame(lapply(vars, function(x) type.convert(as.character(x))))
+}
+
+# Aggregate multiple functions into a single function
+# Combine multiple functions to a single function returning a named vector of outputs
+# 
+# Each function should produce a single number as output
+# 
+# @arguments functions to combine
+# @keyword manip
+#X funstofun(min, max)(1:10)
+#X funstofun(length, mean, var)(rnorm(100))
+funstofun <- function(...) {
+  fnames <- sapply(match.call()[-1], deparse)
+  fs <- list(...)
+  n <- length(fs)
+  
+  function(x, ...) {
+    results <- vector("numeric", length=n)
+    for(i in 1:n) results[[i]] <- fs[[i]](x, ...)
+    names(results) <- fnames
+    results
+  }
+}
+
+# Use default value when null
+#
+# @keyword internal
+nulldefault <- function(x, default) {
+  if (is.null(x)) default else x
+}

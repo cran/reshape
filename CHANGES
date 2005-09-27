@@ -1,0 +1,12 @@
+Reshape 0.7.1
+
+ * default to outputting data.frames
+
+ * now compatible with R 2.4
+ * added fill argument to cast, to specify what value should be used for structural missings
+ * fun.aggregate will always be applied if specified, even if no aggregation occurs
+ * margins now work for non-aggregated data
+ * cast will now accepted a list of functions for fun.aggregate
+ * very long formulas will now work in cast
+ * fixed bug in rbind.fill
+ * should be able to melt any cast form

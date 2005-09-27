@@ -40,7 +40,7 @@ condense.df <- function(data, variables, fun, ...) {
 		return(df)
 	}
 
-	sorted <- sort.df(data, variables)
+	sorted <- sort_df(data, variables)
 	duplicates <- duplicated(sorted[,variables, drop=FALSE])
 	index <- cumsum(!duplicates)
 

@@ -4,7 +4,7 @@
 # @argument Argument required to match generic
 # @argument Argument required to match generic
 # @keyword internal
-print.cast_df <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
+prettyprint <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
 	unx <- x
 	class(unx) <- "data.frame"
 	label.rows <- names(rrownames(x))
@@ -30,24 +30,6 @@ print.cast_df <- function(x, digits=getOption("digits"), ..., colnames=TRUE) {
 	print(result, quote=FALSE, right=TRUE)	
 }
 
-# Subset a cast data frame 
-# Subset a cast data frame. This will result in a normal dataframe, because it is 
-# very tricky to work out if you have kept all the "name" columns necessary
-# for all the normal cast data.frame operations.
-# 
-# @arguments cast\_df object to subset
-# @arguments row indices
-# @arguments column indices
-# @arguments other arguments
-# @arguments discard extra dimensions?
-# @keyword internal
-"[.cast_df" <- function(x, i=1:nrow(x), j=1:ncol(x), ..., drop = FALSE) {
-	unx <- x
-	class(unx) <- "data.frame"
-	
-	unx[i, j, ..., drop=FALSE]
-}
-
 # Strip duplicates.
 # Strips out duplicates from data.frame and replace them with periods.
 # 
@@ -60,17 +42,4 @@ strip.dups <- function(df) {
 	mat <- apply(df, c(1,2), as.character)
 	mat[is.na(mat)] <- "."
 	do.call(cbind, lapply(1:ncol(mat), function(x) clear.dup(mat[,1:x, drop=FALSE], mat[,x, drop=FALSE])))
-}
-
-
-# Convert cast data frame into a matrix
-#
-# @arguments Reshape data frame
-# @keyword internal
-as.matrix.cast_df <- function(x) {
-	m <- as.matrix.data.frame(x[, -(1:(ncol(rrownames(x)))), drop=FALSE])
-	rdimnames(m) <- rdimnames(x)
-	class(m) <- c("cast_matrix", "matrix")
-
-	m
 }

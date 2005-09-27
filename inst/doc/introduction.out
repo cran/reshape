@@ -1,0 +1,22 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}
+\BOOKMARK [1][-]{section.2}{Conceptual framework}{}
+\BOOKMARK [1][-]{section.3}{Melting data}{}
+\BOOKMARK [2][-]{subsection.3.1}{Melting data with id variables encoded in column names}{section.3}
+\BOOKMARK [2][-]{subsection.3.2}{Melting arrays}{section.3}
+\BOOKMARK [2][-]{subsection.3.3}{Missing values in molten data}{section.3}
+\BOOKMARK [1][-]{section.4}{Casting molten data}{}
+\BOOKMARK [2][-]{subsection.4.1}{Basic use}{section.4}
+\BOOKMARK [2][-]{subsection.4.2}{Margins}{section.4}
+\BOOKMARK [2][-]{subsection.4.3}{Returning multiple values}{section.4}
+\BOOKMARK [2][-]{subsection.4.4}{High-dimensional arrays}{section.4}
+\BOOKMARK [2][-]{subsection.4.5}{Lists}{section.4}
+\BOOKMARK [2][-]{subsection.4.6}{Aggregation}{section.4}
+\BOOKMARK [1][-]{section.5}{Other convenience functions}{}
+\BOOKMARK [2][-]{subsection.5.1}{Factors}{section.5}
+\BOOKMARK [2][-]{subsection.5.2}{Data frames}{section.5}
+\BOOKMARK [2][-]{subsection.5.3}{Miscellaneous}{section.5}
+\BOOKMARK [1][-]{section.6}{Case studies}{}
+\BOOKMARK [2][-]{subsection.6.1}{Investigating balance}{section.6}
+\BOOKMARK [2][-]{subsection.6.2}{Tables of means}{section.6}
+\BOOKMARK [2][-]{subsection.6.3}{Investigating inter-rep reliability}{section.6}
+\BOOKMARK [1][-]{section.7}{Where to go next}{}
