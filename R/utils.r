@@ -258,3 +258,4 @@ funstofun <- function(...) {
 nulldefault <- function(x, default) {
   if (is.null(x)) default else x
 }
+

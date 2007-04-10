@@ -4,7 +4,7 @@
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with
+A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with \code{\link{stamp}}.
 }
 \usage{iapply(x, margins=1, fun, ..., DROP=FALSE, COPY.DIMNAMES=FALSE, REORDER=TRUE)}
 \arguments{
@@ -17,7 +17,7 @@ A version of apply that works like apply, but returns the array in the same shap
 \item{REORDER}{}
 }
 
-\details{Applied function should return an array, matrix or vector.}
+\details{\code{fun} should return an array, matrix or vector.}
 
 \examples{a <- array(1:27, c(2,3,4))
 all.equal(a, iapply(a, 1, force))

@@ -1,3 +1,10 @@
+Reshape 0.7.2
+
+ * display all levels of a categorical variable
+ * fixes to rescaler function
+ * added sparseby function contributed by Duncan Murdoch
+ * add rownames to high-D arrays
+
 Reshape 0.7.1
 
  * default to outputting data.frames

@@ -24,8 +24,7 @@ the variables in the data set belong to the other.  If you supply neither,
 melt will assume integer and factor  variables are id variables,
 and all other are measured.}
 \seealso{vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}}
-\examples{data(tips)
-head(melt(tips))
+\examples{head(melt(tips))
 names(airquality) <- tolower(names(airquality))
 airquality.d <- melt(airquality, id=c("month", "day"))
 head(airquality.d)

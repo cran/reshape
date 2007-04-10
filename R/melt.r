@@ -62,7 +62,6 @@ melt.list <- function(data, ..., level=1) {
 # @value molten data
 # @keyword manip
 # @seealso vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}
-#X data(tips)
 #X head(melt(tips))
 #X names(airquality) <- tolower(names(airquality))
 #X airquality.d <- melt(airquality, id=c("month", "day"))
@@ -79,9 +78,11 @@ melt.data.frame <- function(data, id.var, measure.var, variable_name = "variable
 	}
 	
 	df <- do.call("rbind", lapply(var$measure, function(x) {
-		df <- data.frame(data[,var$id, drop=FALSE])
-		df[,variable_name] <- x
-		df$value <- (data[,x]) #as.list
+	  ids <- data[,var$id, drop=FALSE]
+		df <- data.frame(ids, x, data[, x])
+		names(df) <- c(names(ids), variable_name, "value")
+		#df[,variable_name] <- x
+		#df$value <- (data[,x]) #as.list
 		df
 	}))
 

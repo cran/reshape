@@ -1,9 +1,14 @@
-This is pdfeTeXk, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2006.9.24)  29 SEP 2006 09:02
+This is pdfeTeXk, Version 3.141592-1.21a-2.2 (Web2C 7.5.4) (format=pdflatex 2007.2.8)  10 APR 2007 19:59
 entering extended mode
  file:line:error style messages enabled.
-**\nonstopmode \input /Users/hadley/Documents/reshape/reshape/inst/doc/introduc
-tion.tex
-(/Users/hadley/Documents/reshape/reshape/inst/doc/introduction.tex
+**introduction.tex
+(./introduction.tex
+LaTeX2e <2003/12/01>
+Babel <v3.8d> and hyphenation patterns for american, french, german, ngerman, b
+ahasa, basque, bulgarian, catalan, croatian, czech, danish, dutch, esperanto, e
+stonian, finnish, greek, icelandic, irish, italian, latin, magyar, norsk, polis
+h, portuges, romanian, russian, serbian, slovak, slovene, spanish, swedish, tur
+kish, ukrainian, nohyphenation, loaded.
 (/opt/local/share/texmf-dist/tex/latex/koma-script/scrartcl.cls
 Document Class: scrartcl 2004/09/16 v2.9t LaTeX2e KOMA document class
 (/opt/local/share/texmf-dist/tex/latex/koma-script/scrlfile.sty
@@ -385,7 +390,7 @@ Style option: `fancyvrb' v2.6, with DG/SPQR fixes <1998/07/17> (tvz)
 \FV@OutFile=\write4
 
 No file fancyvrb.cfg.
-) (/Library/Frameworks/R.framework/Resources/share/texmf/upquote.sty
+) (/opt/local/share/texmf-dist/tex/latex/upquote/upquote.sty
 Package: upquote 2003/08/11 v1.1 Covington's upright-quote modification to verb
 atim and verb
 
@@ -651,75 +656,73 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 
 {/opt/local/share/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2] [3]
-LaTeX Font Info:    Try loading font information for TS1+aett on input line 122
-.
+[4] [5] [6] [7]
+LaTeX Font Info:    Try loading font information for TS1+aer on input line 335.
 
-(/Library/Frameworks/R.framework/Resources/share/texmf/ts1aett.fd
-File: ts1aett.fd 
-)
-LaTeX Font Info:    Try loading font information for TS1+cmtt on input line 122
-.
+LaTeX Font Info:    No file TS1aer.fd. on input line 335.
 
-(/opt/local/share/texmf-dist/tex/latex/base/ts1cmtt.fd
-File: ts1cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
-)
-LaTeX Font Info:    Font shape `TS1/aett/m/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmtt/m/n' tried instead on input line 122.
- [4] [5] [6] [7]
-[8]
-LaTeX Font Info:    Try loading font information for TS1+aer on input line 358.
 
- (/Library/Frameworks/R.framework/Resources/share/texmf/ts1aer.fd
-File: ts1aer.fd 
-)
-LaTeX Font Info:    Font shape `TS1/aer/m/n' in size <10.95> not available
-(Font)              Font shape `TS1/cmr/m/n' tried instead on input line 358.
+LaTeX Font Warning: Font shape `TS1/aer/m/n' undefined
+(Font)              using `TS1/cmr/m/n' instead
+(Font)              for symbol `textbullet' on input line 335.
 
-Overfull \hbox (26.97968pt too wide) in paragraph at lines 372--373
+
+Overfull \hbox (26.97968pt too wide) in paragraph at lines 349--350
 \T1/aer/m/n/10.95 The cast-ing for-mula has the fol-low-ing ba-sic form: \T1/ae
 tt/m/n/10.95 col_var_1 + col_var_2 $\OMS/cmsy/m/n/10.95 ^^X$ \T1/aett/m/n/10.95
  row_var_1 + row_var_2\T1/aer/m/n/10.95 .
  []
 
-[9] [10] [11] [12] [13] [14]
+[8] [9] [10]
+
+LaTeX Warning: Reference `sec:case_studies' on page 11 undefined on input line 
+513.
+
+
+LaTeX Warning: Reference `sec:case_studies' on page 11 undefined on input line 
+513.
+
+[11] [12] [13] [14]
 
 LaTeX Warning: Reference `ssub:idempotent_apply' on page 15 undefined on input 
-line 675.
+line 747.
 
 
 LaTeX Warning: Reference `ssub:idempotent_apply' on page 15 undefined on input 
-line 675.
+line 747.
 
 [15] [16] [17] [18] [19] [20]
-<./include/3416a75f4cea9109507cacd8e2f2aefc-001.pdf, id=242, 578.16pt x 289.08p
+<./include/3416a75f4cea9109507cacd8e2f2aefc-001.pdf, id=246, 578.16pt x 289.08p
 t>
 File: ./include/3416a75f4cea9109507cacd8e2f2aefc-001.pdf Graphic file (type pdf
 )
  <use ./include/3416a75f4cea9109507cacd8e2f2aefc-001.pdf> [21 <./include/3416a7
 5f4cea9109507cacd8e2f2aefc-001.pdf>] [22] (./introduction.aux)
 
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
- 4680 strings out of 94500
- 64681 string characters out of 1174973
- 117830 words of memory out of 1000000
- 7688 multiletter control sequences out of 10000+50000
- 31404 words of font info for 70 fonts, out of 500000 for 2000
+ 4637 strings out of 94500
+ 63443 string characters out of 1174974
+ 116950 words of memory out of 1000000
+ 7653 multiletter control sequences out of 10000+50000
+ 31106 words of font info for 69 fonts, out of 500000 for 2000
  580 hyphenation exceptions out of 1000
- 39i,7n,36p,982b,353s stack positions out of 1500i,500n,5000p,200000b,5000s
+ 39i,7n,36p,913b,353s stack positions out of 1500i,500n,5000p,200000b,5000s
 PDF statistics:
- 257 PDF objects out of 300000
+ 261 PDF objects out of 300000
  48 named destinations out of 131072
  198 words of extra memory for PDF output out of 65536
-</opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmbx10.pfb> </var/tmp/tex
-fonts/pk/ljfour/jknappen/tc/tcrm1095.600pk></opt/local/share/texmf-dist/fonts/t
-ype1/bluesky/cm/cmsy10.pfb> </var/tmp/texfonts/pk/ljfour/jknappen/tc/tctt1095.6
-00pk></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmmi8.pfb></opt/local/
-share/texmf-dist/fonts/type1/bluesky/cm/cmmi10.pfb></opt/local/share/texmf-dist
-/fonts/type1/bluesky/cm/cmtt10.pfb></opt/local/share/texmf-dist/fonts/type1/blu
-esky/cm/cmr10.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmr12.pfb
-></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmtt12.pfb></opt/local/sha
-re/texmf-dist/fonts/type1/bluesky/cm/cmssbx10.pfb>
-Output written on introduction.pdf (22 pages, 205081 bytes).
+ </var/tmp/texfonts/pk/ljfour/jknappen/tc/tcrm1095.600pk></opt/local/share/te
+xmf-dist/fonts/type1/bluesky/cm/cmbx10.pfb></opt/local/share/texmf-dist/fonts/t
+ype1/bluesky/cm/cmmi8.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/c
+mmi10.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmsy10.pfb></opt/
+local/share/texmf-dist/fonts/type1/bluesky/cm/cmtt10.pfb></opt/local/share/texm
+f-dist/fonts/type1/bluesky/cm/cmr10.pfb></opt/local/share/texmf-dist/fonts/type
+1/bluesky/cm/cmr12.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmtt
+12.pfb></opt/local/share/texmf-dist/fonts/type1/bluesky/cm/cmssbx10.pfb>
+Output written on introduction.pdf (22 pages, 209595 bytes).

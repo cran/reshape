@@ -6,11 +6,11 @@
 \BOOKMARK [2][-]{subsection.3.3}{Missing values in molten data}{section.3}
 \BOOKMARK [1][-]{section.4}{Casting molten data}{}
 \BOOKMARK [2][-]{subsection.4.1}{Basic use}{section.4}
-\BOOKMARK [2][-]{subsection.4.2}{Margins}{section.4}
-\BOOKMARK [2][-]{subsection.4.3}{Returning multiple values}{section.4}
-\BOOKMARK [2][-]{subsection.4.4}{High-dimensional arrays}{section.4}
-\BOOKMARK [2][-]{subsection.4.5}{Lists}{section.4}
-\BOOKMARK [2][-]{subsection.4.6}{Aggregation}{section.4}
+\BOOKMARK [2][-]{subsection.4.2}{Aggregation}{section.4}
+\BOOKMARK [2][-]{subsection.4.3}{Margins}{section.4}
+\BOOKMARK [2][-]{subsection.4.4}{Returning multiple values}{section.4}
+\BOOKMARK [2][-]{subsection.4.5}{High-dimensional arrays}{section.4}
+\BOOKMARK [2][-]{subsection.4.6}{Lists}{section.4}
 \BOOKMARK [1][-]{section.5}{Other convenience functions}{}
 \BOOKMARK [2][-]{subsection.5.1}{Factors}{section.5}
 \BOOKMARK [2][-]{subsection.5.2}{Data frames}{section.5}

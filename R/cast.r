@@ -90,8 +90,12 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 	data <- data[subset, , drop=FALSE]  
 	variables <- cast_parse_formula(formula, names(data))
 
+	v <- unlist(variables)
+	v <- v[v != "result_variable"]
+	data[v] <- lapply(data[v], as.factor)
 
-	if (length(fun.aggregate) > 1) fun.aggregate <- do.call(funstofun, as.list(match.call()[[4]])[-1])
+	if (length(fun.aggregate) > 1) 
+		fun.aggregate <- do.call(funstofun, as.list(match.call()[[4]])[-1])
 	
 	if (!is.null(variables$l)) {
 		res <- nested.by(data, data[variables$l], function(x) {
@@ -162,7 +166,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 	
 	if (!missing(margins) && isTRUE(margins)) margins <- c(variables, "grand_row", "grand_col")
 	
-	aggregate <- nrow(unique(data[,variables, drop=FALSE])) < nrow(data)
+	aggregate <- nrow(unique(data[,variables, drop=FALSE])) < nrow(data) || !is.null(fun.aggregate)
 	if (aggregate) {
 		if (missing(fun.aggregate) || is.null(fun.aggregate)) {
 			warning("Aggregation requires fun.aggregate: length used as default", call.=FALSE)
@@ -178,11 +182,10 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 			vars[[2]] <- c(vars[[2]], "result_variable")
 		}
 	} else {
-		data.r <- data.frame(data[,c(variables), drop=FALSE], result = data$value)	
+		data.r <- data.frame(data[,c(variables), drop=FALSE], result = data$value)
 		if (!is.null(fun.aggregate)) data.r$result <- sapply(data.r$result, fun.aggregate)
 	}
 
-  
   if (length(vars.clean) > 2 && margins) {
     warning("Sorry, you currently can't use margins with high D arrays", .call=FALSE)
     margins <- FALSE
@@ -190,16 +193,17 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), fun.aggregate, ..., df=df)
 	
 	result <- sort_df(rbind.fill(data.r, margins.r), unlist(vars))
+	result <- add.missing.levels(result, unlist(vars), fill=fill)
 	result <- add.all.combinations(result, vars, fill=fill)
 
-	dimnames <- lapply(vars, function(x) dim.names(result, x))
+	dimnames <- lapply(vars, function(x) dim_names(result, x))
 
   r <- if (!df) unlist(result$result) else result$result
 	reshaped <- array(r, rev(sapply(dimnames, nrow)))
   
   reshaped <- aperm(reshaped, length(dim(reshaped)):1)
-	#dimnames(reshaped) <- lapply(dimnames, function(x) apply(x, 1, paste, collapse="-"))
-	rownames(reshaped) <- 1:nrow(reshaped)
+	dimnames(reshaped) <- lapply(dimnames, function(x) apply(x, 1, paste, collapse="-"))
+	names(dimnames(reshaped)) <- lapply(vars, paste, collapse="-")
 	
 	if (length(vars.clean) > 2) return(reshaped)
 	if (df) return(cast_matrix(reshaped, dimnames))
@@ -241,6 +245,26 @@ add.all.combinations <- function(data, vars = list(NULL), fill=NA) {
 	sort_df(result, unlist(vars))
 }
 
+# Add in any missing values
+# @keyword internal
+add.missing.levels <- function(data, vars=NULL, fill=NA) {
+	return(data) 
+	
+	if (is.null(vars)) return(data)
+	cat <- sapply(data[,vars, drop=FALSE], is.factor)
+
+	levels <- lapply(data[,vars, drop=FALSE][,cat, drop=FALSE], levels)
+	allcombs <- do.call(expand.grid, levels)
+
+	current <- unique(data[,vars, drop=FALSE])
+	extras <- allcombs[!duplicated(rbind(current, allcombs))[-(1:nrow(current))], , drop=FALSE]
+
+	result <- rbind.fill(data, extras)
+	if (!is.na(fill)) result[is.na(result)] <- fill
+
+	result
+}
+
 
 
 # Dimension names
@@ -249,7 +273,7 @@ add.all.combinations <- function(data, vars = list(NULL), fill=NA) {
 # @arguments data frame
 # @arguments variables to use
 # @keyword internal
-dim.names <- function(data, vars) {
+dim_names <- function(data, vars) {
 	if (!is.null(vars) && length(vars) > 0) {
 		unique(data[,vars,drop=FALSE]) 
 	} else {

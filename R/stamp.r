@@ -50,3 +50,11 @@ condense.df <- function(data, variables, fun, ...) {
 	cols$results <- array(results)
 	cols
 }
+
+# Tidy up stamped data set
+# @keyword internal
+tidystamp <- function(x) {
+ bind <- function(i) cbind(x[i, -ncol(x),drop=FALSE], x$value[[i]])
+ l <- lapply(1:nrow(x), bind)
+ do.call(rbind.fill, l)
+}

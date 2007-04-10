@@ -29,32 +29,26 @@
 % smiths <- data.frame(subject = c("John Smith", "Mary Smith"), time = as.integer(1), age = c(33, NA), weight=c(90, NA), height=c(1.87, 1.54))
 % library(ggplot)
 % library(xtable)
-
-
 % >>>
 
 Reshaping data is a common task in practical data analysis, and it is usually tedious and unintuitive.  
 
-Data often has multiple levels of grouping (nested treatments, split plot designs, or repeated measurements) and typically requires investigation at multiple levels. For example, from a long term clinical study we may be interested in investigating relationships over time, or between times or patients or treatments. Performing these investigations fluently requires the data to be reshaped in different ways, but most software packages make it difficult to generalise these tasks and code needs to be written for each specific case. 
+Data often has multiple levels of grouping (nested treatments, split plot designs, or repeated measurements) and typically requires investigation at multiple levels. For example, from a long term clinical study we may be interested in investigating summarising patients, treatments, trends over time or combinations of each. Performing these investigations fluently requires the data to be reshaped in different ways, but most software packages make it difficult to generalise these tasks and code needs to be written for each specific case. 
 
-While most practitioners are intuitively familiar with the idea of reshaping, it is useful define it a little more formally.  Data reshaping is easiest to define with respect to aggregation.  Aggregation is a common and familiar task where data is reduced and rearranged into a smaller, more convenient form, with a concomitant reduction in the amount of information.  One commonly used aggregation procedure is Excel's Pivot tables.  Reshaping involves a similar rearrangement, but preserves all original information; where aggregation reduces many cells in the original data set to one cell in the new dataset, reshaping preserves a one-to-one connection.   These ideas are expanded and formalised in the next section. 
+While most practitioners are intuitively familiar with the idea of reshaping, it is useful define it a little more formally.  Data reshaping is easiest to define with respect to aggregation.  Aggregation is a common and familiar task where data is reduced and rearranged into a smaller, more convenient form, with a concomitant reduction in the amount of information.  One commonly used aggregation tool is Excel's Pivot tables.  Reshaping involves a similar rearrangement, but preserves all original information; where aggregation reduces many cells in the original data set to one cell in the new dataset, reshaping preserves a one-to-one connection.   These ideas are expanded and formalised in the next section. 
 
-In R, there are a number of general functions that can aggregate data, for example {\tt tapply}, {\tt by} and {\tt aggregate}, and a function specifically for reshaping data, {\tt reshape}.  Each of these functions tends to deal well with one or two specific scenarios, and each requires slightly different input arguments.  In practice, careful thought is required to piece together the correct sequence of operations to get your data into the form that you want.  The {\tt reshape} package overcomes these problems with a general conceptual framework that needs just two functions: {\tt melt} and {\tt cast}.
+In R, there are a number of general functions that can aggregate data, for example {\tt tapply}, {\tt by} and {\tt aggregate}, and a function specifically for reshaping data, {\tt reshape}.  Each of these functions deals well with one or two specific scenarios, and each requires slightly different input arguments.  In practice, careful thought is required to piece together the correct sequence of operations to get your data into the form that you want.  The {\tt reshape} package overcomes these problems with a general conceptual framework that needs just two functions: {\tt melt} and {\tt cast}.
 
-In this form it is difficult to investigate relationships between other facets of the data: between subjects, or treatments, or replicates.  Reshaping the data allows us to explore these other relationships while still being able to use the familiar tools that operate on columns.
-
-This document provides an introduction to the conceptual framework behind {\tt reshape} with the two fundamental operations of melting and casting.  I then provide a detailed description of {\tt melt} and {\tt cast} with plenty of examples.  I discuss stamp, an extension of cast, and other useful functions in the {\tt reshape} package.  Finally, I provide some case studies using reshape in real life examples.
-
-
+This document introduces to the conceptual framework of melting and casting, \S \ref{sec:framework}, then provides a detailed description of each with plenty of examples, \S \ref{sec:melt} and \ref{sec:cast}.  The {\tt reshape} package also provides a number of convenience functions for general data manipulation, described in \S \ref{sec:convenience}. The paper concludes with case studies using melt and cast in real life examples, \S \ref{sec:case-studies}.
 
 \newpage
-\section{Conceptual framework}
+\section{Conceptual framework}\label{sec:framework}
 
 To help us think about the many ways we might rearrange a data set it is useful to think about data in a new way.  Usually, we think about data in terms of a matrix or data frame, where we have observations in the rows and variables in the columns.  For the purposes of reshaping, we can divide the variables into two groups: identifier and measured variables.
 
 \begin{enumerate}
-	\item Identifier, or id, variables identify the unit that measurements take place on.  Id variables are usually discrete, and are typically fixed by design.  In ANOVA notation ($Y_{ijk}$), id variables are the indices on the variables ($i, j, k$).
-	\item Measured variables represent what is measured on that unit ($Y$).
+	\item Identifier, or id, variables identify the unit that measurements take place on.  Id variables are usually discrete, and are typically fixed by design.  In ANOVA notation ($Y_{ijk}$), id variables are the indices on the variables ($i, j, k$).  In database terminology, these are the primary keys.
+	\item Measured variables represent what attributes measured on each unit ($Y$).
 \end{enumerate}
 
 \noindent It is possible to take this abstraction a step further and say there are only id variables and a value, where the id variables also identify what measured variable the value represents.  For example, we could represent this data set, which has two id variables, subject and time, 
@@ -82,7 +76,7 @@ To help us think about the many ways we might rearrange a data set it is useful 
 
 % decumar<<< 
 % smithsm <- melt(smiths, id=c("subject", "time"), preserve.na=FALSE)
-% print(xtable(smithsm, align="|l|l|r||l|r|", digits=rep(0,5)), floating=FALSE)
+% print(xtable(smithsm, align="|l|l|r|l||r|", digits=c(rep(0,4),2)), floating=FALSE)
 % |||
 % latex table generated in R 2.4.0 by xtable 1.3-2 package
 % Wed Sep 27 12:57:16 2006
@@ -99,35 +93,18 @@ To help us think about the many ways we might rearrange a data set it is useful 
 % >>>
 
 \bigskip
-\noindent where each row represents one observation of one variable.  This operation is called melting and produces ``molten'' data.  Compared to the original data set, it has a new id variable ``variable'', and a new column ``value'', which represents the value of that observation.  We now have the data in a form in which there are only id variables and a value.
+\noindent where each row represents one observation of one variable.  This operation is called {\bf melting} and produces ``molten'' data.  Compared to the original data set, it has a new id variable ``variable'', and a new column ``value'', which represents the value of that observation.  We now have the data in a form in which there are only id variables and a value.
 
-From this form, we can create new forms by specifying which variables should form the columns and rows.  In the original data frame, the ``variable'' id variable forms the columns, and all identifiers form the rows.  We don't have to specify all the original id variables in the new form.  When we don't, the id variables no longer uniquely identify one row, and in this case we need a function that reduces these many numbers to one.  This is called an aggregation function. 
+From this form, we can create new forms by specifying which variables should form the columns and rows.  This operating is called {\bf casting}.  In the original data frame, the ``variable'' id variable forms the columns, and all identifiers form the rows.  We don't have to specify all the original id variables in the new form.  When we don't, the id variables no longer uniquely identify one row, and in this case we need a function that reduces these many numbers to one.  This is called an aggregation function. 
 
-The following section describes the melting operation in detail with an implementation in R.
+The following section continues with the example and describes the melting operation in detail with an implementation in R.
 
 \newpage
-\section{Melting data}
+\section{Melting data}\label{sec:melt}
 
 Melting a data frame is a little trickier in practice than it is in theory.  This section describes the practical use of the {\tt melt} function in R.
 
-The {\tt melt} function needs to know which variables are measured and which are identifiers.  This distinction should be obvious from your design: if you fixed the value, it is an id variable.  If you don't specify them explicitly, {\tt melt} will assume that any factor or integer column is an id variable.  If you specify only one of measured and identifier variables, {\tt melt} assumes that all the other variables are the other sort.  For example, with the {\tt smiths} dataset, as shown below, all the following calls have the same effect:
-
-% decumar<<< 
-% interweave({
-% str(smiths)
-% })
-% |||
-\begin{alltt}
-> str(smiths)
-'data.frame':	2 obs. of  5 variables:
- $ subject: Factor w/ 2 levels "John Smith","Mary Smith": 1 2
- $ time   : int  1 1
- $ age    : num  33 NA
- $ weight : num  90 NA
- $ height : num  1.87 1.54
-
-\end{alltt}
-% >>>
+The {\tt melt} function needs to know which variables are measured and which are identifiers.  This distinction should be obvious from your design: if you fixed the value, it is an id variable.  If you don't specify the variables explicitly, {\tt melt} will assume that any factor or integer column is an id variable.  If you specify only one of measured and identifier variables, {\tt melt} assumes that all the other variables are the other sort.  For example, with the {\tt smiths} dataset, as used in the previous section, all the following calls have the same effect:
 
 \begin{alltt}
 melt(smiths, id=c("subject","time"), measured=c("age","weight","height"))
@@ -155,7 +132,7 @@ melt(smiths)
 \end{alltt}
 % >>>
 
-Melt doesn't make many assumptions about your measured and id variables: there can be any number, in any order, and the values within the columns can be in any order too.  There is only one assumption that {\tt melt} makes: all measured values must be numeric.  This is usually ok, because most of the time measured variables are numeric, but unfortunately if you are working with categorical or date measured variables, {\tt reshape} isn't going to be much help.  If you need this functionality, please let me know and I'll make it more of a priority.
+Melt doesn't make many assumptions about your measured and id variables: there can be any number, in any order, and the values within the columns can be in any order too.  You do, however, need to ensure there are no missing values in id variables.  There is only one assumption that {\tt melt} makes: all measured values must be of the same type.  This is usually ok, because most of the time measured variables are numeric, but unfortunately if you are working with measured variables of different types, you will need to split them intop separate data frames.
 
 \subsection{Melting data with id variables encoded in column names}\label{sub:multiple-identifiers}
 
@@ -350,7 +327,7 @@ However, you may expect these to be in the data frame, and it is a bad idea for 
 If you don't use {\tt preserve.na = FALSE} you will need to make sure to account for possible missing values when aggregating (\secref{sub:aggregation}), for example, by supplying {\tt na.rm = TRUE} to {\tt mean}, {\tt sum} and {\tt var}.
 
 \newpage
-\section{Casting molten data}\label{sub:casting}
+\section{Casting molten data}\label{sec:cast}
 
 Once you have your data in the molten form, you can use {\tt cast} to create the form you want.  {\tt Cast} has two arguments that you will always supply:
 
@@ -359,7 +336,7 @@ Once you have your data in the molten form, you can use {\tt cast} to create the
 	\item {\tt formula}: the casting formula which describes the shape of the output format (if you omit this argument, cast will return the data frame to its pre-molten form)
 \end{itemize} 
 
-Most of this section explains the different casting formulas you can use.  It also explains the use of the other optional arguments to cast:
+This section explains the different casting formulas you can use.  It also explains the use of the other optional arguments to cast:
 
 \begin{itemize}
 	\item {\tt fun.aggregate}: aggregation function to use (if necessary)
@@ -377,7 +354,7 @@ The casting formula has the following basic form: {\tt col\_var\_1 +  col\_var\_
 	\item {\tt result\_variable} is used when your aggregation formula returns multiple results.  See \secref{sub:multiple_returns} for more details.
 \end{itemize}
 
-The first set of examples illustrated reshaping: all the original variables are used.
+The first set of examples illustrate reshaping: all the original variables are retained in the new form.  Each of these reshaping changes which of the identifier variables appear in the columns and which in the rows.  The typical view of a data frame has the ``variable'' variable in the columns and all others in the rows, but if we were interested in investigating the relationships between subjects or times, we might put those in the columns instead.
 
 % decumar<<< 
 % interweave({
@@ -414,17 +391,65 @@ The first set of examples illustrated reshaping: all the original variables are 
 \end{alltt}
 % >>>
 
-The following examples demonstrate aggregation.  See \secref{sub:aggregation} for more details.  These examples use the french fries dataset included in the {\tt reshape} package.  It is data from a sensory experiment on french fries, where different types of frier oil, {\tt treatment}, were tested by different people, {\tt subject}, over ten weeks {\tt time}.
+The following examples demonstrate aggregation.  See \secref{sub:aggregation} for more details.  These examples use the french fries dataset included in the {\tt reshape} package.  The first few rows are shown in \ref{tbl:ff}.  It is data from a sensory experiment on french fries, where different types of frier oil, {\tt treatment}, were tested by different people, {\tt subject}, over ten weeks {\tt time}.
+
+% decumar<<<
+% xtable(head(french_fries), label="tbl:ff", caption="Sample of french fries dataset")
+% |||
+% latex table generated in R 2.4.0 by xtable 1.3-2 package
+% Wed Sep 27 12:57:22 2006
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{rlllrrrrrr}
+\hline
+ & time & treatment & subject & rep & potato & buttery & grassy & rancid & painty \\
+\hline
+61 & 1 & 1 & 3 & 1.00 & 2.90 & 0.00 & 0.00 & 0.00 & 5.50 \\
+25 & 1 & 1 & 3 & 2.00 & 14.00 & 0.00 & 0.00 & 1.10 & 0.00 \\
+62 & 1 & 1 & 10 & 1.00 & 11.00 & 6.40 & 0.00 & 0.00 & 0.00 \\
+26 & 1 & 1 & 10 & 2.00 & 9.90 & 5.90 & 2.90 & 2.20 & 0.00 \\
+63 & 1 & 1 & 15 & 1.00 & 1.20 & 0.10 & 0.00 & 1.10 & 5.10 \\
+27 & 1 & 1 & 15 & 2.00 & 8.80 & 3.00 & 3.60 & 1.50 & 2.30 \\
+\hline
+\label{tbl:ff}
+\end{tabular}
+\end{center}
+\end{table}
+% >>>
+
+The most severe type of aggregation is reducing an entire table to one number.  This is what happens when you use the cast formula $. \sim .$ 
 
 % decumar<<< 
 % interweave({
 % ffm <- melt(french_fries, id=1:4, preserve=FALSE)
 % cast(ffm, . ~ ., length)
+% })
+% |||
+%>>>
+
+The next example produces a summary for each treatment.  We can get the same results using {\tt taply}, or for the special case of {\tt length}, table.  The disadvantage of these methods is their lack of generality -- they can only produce certain ``shapes'' of data.
+
+% decumar<<< 
+% interweave({
 % cast(ffm, treatment ~ ., length)
-% cast(ffm, . ~ treatment, length)
+% tapply(ffm$value, ffm$treatment, length)
+% table(ffm$treatment)
+% cast(ffm, treatment ~ ., sum)
+% tapply(ffm$value, ffm$treatment, sum)
+% })
+% |||
+%>>>
+
+Here are some more examples illustrating the effects of changing the order ad position of variables in the cast formula.  Each of these examples displays exactly the same data, just arranged in a slightly different form.  When thinking about how to arrange your data, think about which comparisons are most important.
+
+% decumar<<< 
+% interweave({
 % cast(ffm, rep ~ treatment, length)
+% table(ffm$rep, ffm$treatment)
 % cast(ffm, treatment ~ rep, length)
+% table(ffm$treatment, ffm$rep)
 % cast(ffm, treatment + rep ~ ., length)
+% ftable(ffm[c("treatment", "rep")], row.vars=1:2)
 % cast(ffm, rep + treatment ~ ., length)
 % cast(ffm, . ~ treatment + rep, length)
 % })
@@ -483,9 +508,55 @@ The following examples demonstrate aggregation.  See \secref{sub:aggregation} fo
 
 As illustrated above, the order in which the row and column variables are specified in is very important.  As with a contingency table there are many possible ways of displaying the same variables, and the way they are organised reveals different patterns in the data.  Variables specified first vary slowest, and those specified last vary fastest.  Because comparisons are made most easily between adjacent cells, the variable you are most interested in should be specified last, and the early variables should be thought of as conditioning variables.  An additional constraint is that displays have limited width but essentially infinite length, so variables with many levels must be specified as row variables.  
 
+\subsection{Aggregation}\label{sub:aggregation}
+
+Whenever there are fewer cells in the cast form than there were in the original data format, an aggregation function is necessary.  This formula reduces multiple cells into one, and is supplied in the {\tt fun.aggregate} argument, which defaults (with a warning) to {\tt length}.  Aggregation is a very common and useful operation and the case studies section (\secref{sec:case_studies}) contains many other examples of aggregation.  
+
+The aggregation function will be passed the vector of values for one cell.  It may take other arguments, passed in through {\tt ...} in {\tt cast}.  Here are a few examples:
+
+% decumar<<< 
+% interweave({
+% cast(ffm, . ~ treatment)
+% cast(ffm, . ~ treatment, function(x) length(x))
+% cast(ffm, . ~ treatment, length)
+% cast(ffm, . ~ treatment, sum)
+% cast(ffm, . ~ treatment, mean)
+% cast(ffm, . ~ treatment, mean, trim=0.1)
+% })
+% |||
+\begin{alltt}
+> cast(ffm, . ~ treatment)
+Warning:  Aggregation requires fun.aggregate: length used as default 
+  value   X1   X2   X3
+1 value 1159 1157 1155
+
+> cast(ffm, . ~ treatment, function(x) length(x))
+  value   X1   X2   X3
+1 value 1159 1157 1155
+
+> cast(ffm, . ~ treatment, length)
+  value   X1   X2   X3
+1 value 1159 1157 1155
+
+> cast(ffm, . ~ treatment, sum)
+  value   X1   X2   X3
+1 value 3702 3640 3640
+
+> cast(ffm, . ~ treatment, mean)
+  value  X1  X2  X3
+1 value 3.2 3.1 3.2
+
+> cast(ffm, . ~ treatment, mean, trim = 0.1)
+  value  X1  X2  X3
+1 value 2.6 2.5 2.6
+
+\end{alltt}
+% >>>
+
+
 \subsection{Margins}\label{sub:margins}
 
-It's often useful to be able to add margins to your tables.  What is a margin?  It is marginal in the statistical sense: we have averaged over the other the variables.  You can tell {\tt cast} to display all margins with {\tt margins = TRUE}, or list individual variables in a character vector, {\tt margins=c("subject","day")}.  There are two special margins, {\tt "grand\_col"} and {\tt "grand\_row"}, which display margins for the overall columns and rows respectively. Margins are displayed with a ``.'' instead of the value of the variable. 
+It's often useful to be able to add margins to your tables.  What is a margin?  It is marginal in the statistical sense: we have averaged over the other variables.  You can tell {\tt cast} to display all margins with {\tt margins = TRUE}, or list individual variables in a character vector, {\tt margins=c("subject","day")}.  There are two special margins, {\tt "grand\_col"} and {\tt "grand\_row"}, which display margins for the overall columns and rows respectively. Margins are displayed with a ``.'' instead of the value of the variable. 
 
 These examples illustrate some of the possible ways to use margins.  I've used sum as the aggregation function so that you can check the results yourself. Note that changing the order and position of the variables in the cast formula affects the margins that appear.  
 
@@ -637,14 +708,15 @@ Occasionally it is useful to aggregate with a function that returns multiple val
 \end{alltt}
 % >>>
 
-Returning multidimensional objects (eg. matrices or arrays) from an aggregation doesn't currently work very well.  However, you can probably work around this deficiency by creating a high-D array, and then using {\tt iapply}.
+Using an aggregation function that returns multidimensional objects (eg. matrices or arrays) does not work.  You may be able to work around this deficiency by creating a high-D array, and then using {\tt iapply}.
 
 \subsection{High-dimensional arrays}\label{sub:high_dimensional_arrays}
 
-You can use more than one $\sim$ to create structures with more than two dimensions.  For example, a cast formula of {\tt x $\sim$ y $\sim$ z} will create a 3D array with x, y, and z dimensions. You can also still use multiple variables in each dimension: {\tt x + a $\sim$ y + b $\sim$ z + c}.  The following example shows the resulting dimensionality of various casting formulas (I don't show the actual output because it would be too large.  You may want to verify the results for yourself):
+You can use more than one $\sim$ to create structures with more than two dimensions.  For example, a cast formula of {\tt x $\sim$ y $\sim$ z} will create a 3D array with x, y, and z dimensions. You can still use multiple variables in each dimension: {\tt x + a $\sim$ y + b $\sim$ z + c}.  The following example shows the resulting dimensionality of various casting formulas (I don't show the actual output for examples because it would be too large.  You may want to verify the results for yourself):
 
 % decumar<<< 
 % interweave({
+% options(digits=2)
 % dim(cast(ffm, time ~ variable ~ treatment, mean))
 % dim(cast(ffm, time ~ variable ~ treatment + rep, mean))
 % dim(cast(ffm, time ~ variable ~ treatment ~ rep, mean))
@@ -701,7 +773,7 @@ The $\sim$ operator is a type of crossing operator, as all combinations of the v
 \end{alltt}
 % >>>
 
-Unfortunately, margins currently don't work with high-dimensional arrays.  If you need this functionality, please let me know and I'll make it more a priority.  Bribes always help too.
+Margins currently do not work with high-dimensional arrays.  
 
 \subsection{Lists}\label{sub:lists}
 
@@ -710,10 +782,10 @@ You can also use {\tt cast} to produce lists.  This is done with the $|$ operato
 % decumar<<< 
 % interweave({
 % cast(ffm, treatment ~ rep | variable, mean)
-% length(cast(ffm, treatment ~ rep | variable, mean))
-% length(cast(ffm, treatment ~ rep | subject, mean))
-% length(cast(ffm, treatment ~ rep | time, mean))
-% sapply(cast(ffm, treatment ~ rep | time + variable, mean), length)
+% cast(ffm, . ~ variable | rep, mean)
+% varrep <- cast (ffm, . ~ time | variable + rep, mean)
+% varrep$painty
+% varrep$painty$`2`
 % })
 % |||
 \begin{alltt}
@@ -765,54 +837,7 @@ $painty
 \end{alltt}
 % >>>
 
-This form is useful for input to {\tt lapply} and {\tt sapply}, and completes the discussion of the different types of output you can create with reshape.  The rest of the section discusses the other options available for output.
-
-\subsection{Aggregation}\label{sub:aggregation}
-
-Whenever there are fewer cells in the cast form than there were in the original data format, an aggregation function is necessary.  This formula reduces multiple cells into one, and is supplied in the {\tt fun.aggregate} argument, which defaults (with a warning) to {\tt length}.  Aggregation is a very common and useful operation and the case studies section (\secref{sec:case_studies}) contains many other examples of aggregation.  
-
-The aggregation function will be passed  the vector of a values for one cell.  It may take other arguments, passed in through {\tt ...} in {\tt cast}.  Here are a few examples:
-
-% decumar<<< 
-% interweave({
-% cast(ffm, . ~ treatment)
-% cast(ffm, . ~ treatment, function(x) length(x))
-% cast(ffm, . ~ treatment, length)
-% cast(ffm, . ~ treatment, sum)
-% cast(ffm, . ~ treatment, mean)
-% cast(ffm, . ~ treatment, mean, trim=0.1)
-% })
-% |||
-\begin{alltt}
-> cast(ffm, . ~ treatment)
-Warning:  Aggregation requires fun.aggregate: length used as default 
-  value   X1   X2   X3
-1 value 1159 1157 1155
-
-> cast(ffm, . ~ treatment, function(x) length(x))
-  value   X1   X2   X3
-1 value 1159 1157 1155
-
-> cast(ffm, . ~ treatment, length)
-  value   X1   X2   X3
-1 value 1159 1157 1155
-
-> cast(ffm, . ~ treatment, sum)
-  value   X1   X2   X3
-1 value 3702 3640 3640
-
-> cast(ffm, . ~ treatment, mean)
-  value  X1  X2  X3
-1 value 3.2 3.1 3.2
-
-> cast(ffm, . ~ treatment, mean, trim = 0.1)
-  value  X1  X2  X3
-1 value 2.6 2.5 2.6
-
-\end{alltt}
-% >>>
-
-You can also display margins and use functions that return multiple results.  See the next two sections for details.
+This form is useful for input to {\tt lapply} and {\tt sapply}, and completes the discussion of the different types of output you can create with reshape.
 
 %\subsection{Subsetting}\label{sub:subsetting}
 %
@@ -834,15 +859,35 @@ You can also display margins and use functions that return multiple results.  Se
 %Stamp makes it easy to look at multivariate summaries for subsets of your data.
 
 \newpage
-\section{Other convenience functions}\label{sec:other_convenience_functions}
+\section{Other convenience functions}\label{sec:convenience}
 
-There are many other problems encountered in practical analysis that can be painful to overcome with some handy functions.  This section describes some of the functions that reshape provides to make dealing with data a little bit easier.  
+There are many other problems encountered in practical analysis that can be painful to overcome with out some handy functions.  This section describes some of the functions that reshape provides to make dealing with data a little bit easier.  
 
 \subsection{Factors}\label{sub:factor_related}
 
 \begin{itemize}
 	\item {\tt combine\_factor} combines levels in a factor.  For example, if you have many small levels you can combine them together into an ``other'' level.
+	
+% decumar<<< 
+% interweave({
+% (f <- factor(letters[1:5]))
+% combine_factor(f, c(1, 2, 3, 3, 3))
+% combine_factor(f, c(1, 2))
+% })
+% |||
+% >>>
+	
 	\item {\tt reorder\_factor} reorders a factor based on another variable.  For example, you can order a factor by the average value of a variable for each level.
+
+% decumar<<< 
+% interweave({
+% df <- data.frame(a=letters[sample(5, 15, replace=TRUE)], y=rnorm(15))
+% (f <- reorder_factor(df$a, tapply(df$y, df$a, mean)))
+% (f <- reorder_factor(df$a, tapply(df$y, df$a, length)))
+% })
+% |||
+% >>>
+
 \end{itemize}
 
 \subsection{Data frames}\label{sub:data_related}
@@ -856,41 +901,28 @@ There are many other problems encountered in practical analysis that can be pain
 \subsection{Miscellaneous}\label{sub:miscellaneous}
 
 \begin{itemize}
-	\item {\tt round\_any} allows you to round a number to any degree of accuracy, e.g.\ to the nearest 1, 10, or any other number.
+	\item {\tt round\_any} allows you to round a number to any degree of accuracy, e.g.\ to the nearest 1, 10, or any other number. 
+	
+% decumar<<< 
+% interweave({
+% round_any(105, 10)
+% round_any(105, 4)
+% round_any(105, 4, ceiling)
+% |||
+% >>>	
+
 	\item {\tt iapply} is an idempotent version of the {\tt apply} function.  This is useful when dealing with high-dimensional arrays as it will return the array in the same shape that you sent it.  It also supports functions that return matrices or arrays in a sensible manner.
 \end{itemize}
 
 \newpage
-\section{Case studies}\label{sec:case_studies}
+\section{Case studies}\label{sec:case-studies}
 
 These case studies provide fuller exposition of using reshape for specific tasks.
 
 \subsection{Investigating balance}\label{sub:investigating_balance}
 
-This data is from a sensory experiment investigating the effect of different frying oils on the taste of french fries over time.  There are three different types of frying oils (treatment), each in two different fryers (rep), tested by 12 people (subject) on 10 different days (time).  The sensory attributes recorded, in order of desirability, are potato, buttery, grassy, rancid, painty flavours.  The first few rows of the data look like:
+This data is from a sensory experiment investigating the effect of different frying oils on the taste of french fries over time.  There are three different types of frying oils (treatment), each in two different fryers (rep), tested by 12 people (subject) on 10 different days (time).  The sensory attributes recorded, in order of desirability, are potato, buttery, grassy, rancid, painty flavours.  The first few rows of the data are shown in Table \ref{tbl:ff}.
 
-% decumar<<<
-% xtable(head(french_fries))
-% |||
-% latex table generated in R 2.4.0 by xtable 1.3-2 package
-% Wed Sep 27 12:57:22 2006
-\begin{table}[ht]
-\begin{center}
-\begin{tabular}{rlllrrrrrr}
-\hline
- & time & treatment & subject & rep & potato & buttery & grassy & rancid & painty \\
-\hline
-61 & 1 & 1 & 3 & 1.00 & 2.90 & 0.00 & 0.00 & 0.00 & 5.50 \\
-25 & 1 & 1 & 3 & 2.00 & 14.00 & 0.00 & 0.00 & 1.10 & 0.00 \\
-62 & 1 & 1 & 10 & 1.00 & 11.00 & 6.40 & 0.00 & 0.00 & 0.00 \\
-26 & 1 & 1 & 10 & 2.00 & 9.90 & 5.90 & 2.90 & 2.20 & 0.00 \\
-63 & 1 & 1 & 15 & 1.00 & 1.20 & 0.10 & 0.00 & 1.10 & 5.10 \\
-27 & 1 & 1 & 15 & 2.00 & 8.80 & 3.00 & 3.60 & 1.50 & 2.30 \\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-% >>>
 
 We first melt the data to use in subsequent analyses.  
 
@@ -914,7 +946,7 @@ We first melt the data to use in subsequent analyses.
 \end{alltt}
 % >>>
 
-One of the first things we might be interested in is how balanced this design is, and whether there are many different missing values.  We are interested in missingness, so remove missings to put structural and non-structural on an equal footing with {\tt preserve.na = FALSE}.   We can investigate balance using length as our aggregation function:
+One of the first things we might be interested in is how balanced this design is, and whether there are many different missing values.  We are interested in missingness, so we remove missings to put structural and non-structural on an equal footing with {\tt preserve.na = FALSE}.   We can investigate balance using length as our aggregation function:
 
 % decumar<<< 
 % interweave({
@@ -967,23 +999,13 @@ Of course we can also use our own aggregation function.  Each subject should hav
 \end{alltt}
 % >>>
 
-We can also easily see the range of values that each variable takes:
+This table shows two types of missingness.  Positive numbers indicate the number of observations missing from the 30 that should have occurred (3 treatments $\times$ 2 reps $\times$ 5 sensory attributes).  Missing values ({\tt NA}) indicate that there are no records present for that combination of subject and time.  If we want, we can replace those complete missings with 30:
 
 % decumar<<< 
 % interweave({
-% cast(ffm, variable ~ ., function(x) c(min=min(x), max=max(x)))
+% cast(ffm, subject ~ time, function(x) 30 - length(x), fill=30)
 % })
 % |||
-\begin{alltt}
-> cast(ffm, variable ~ ., function(x) c(min = min(x), max = max(x)))
-  variable min max
-1   potato   0  15
-2  buttery   0  11
-3   grassy   0  11
-4   rancid   0  15
-5   painty   0  13
-
-\end{alltt}
 % >>>
 
 \subsection{Tables of means}\label{sub:tables_of_means}
@@ -995,7 +1017,7 @@ Since the data is fairly well balanced, we can do some (crude) investigation as 
 % decumar<<< 
 % interweave({
 % options(digits=2)
-% cast(ffm, treatment ~ variable, mean, margins=c("grand_col", "grand_row")) 
+% cast(ffm, treatment ~ variable, mean, margins=T) 
 % }) 
 % |||
 \begin{alltt}
@@ -1011,7 +1033,7 @@ Since the data is fairly well balanced, we can do some (crude) investigation as 
 \end{alltt}
 % >>>
 
-It doesn't look like there is any effect of treatment.  This can be confirmed using a more formal analysis of variance.
+A strong treatment effect is not apparent. This can be confirmed using a more formal analysis of variance.
 
 \subsection{Investigating inter-rep reliability}\label{sub:investigation_inter_rep_reliability}
 
@@ -1019,7 +1041,7 @@ Since we have a repetition over treatments, we might be interested in how reliab
 
 % decumar<<< 
 % interweave({
-% .img(.print(qplot(X1, X2, . ~ variable, data=cast(ffm, ... ~ rep))), height=4, width=6)
+% .img(.print(qplot(X1, X2, . ~ variable, data=cast(ffm, ... ~ rep))), height=4, width=8)
 % }) 
 % |||
 \begin{alltt}
@@ -1031,7 +1053,7 @@ Since we have a repetition over treatments, we might be interested in how reliab
 \end{alltt}
 % >>>
 
-The correlation looks strong for potatoey, weak for buttery and grassy, and particularly poor for painty.
+This plot is not easy to understand, as we are plotting two rather unusual variables.  Each point corresponds to one measurement for a given subject, date and time.  This gives a scatterplot for each variable that can be used to assess the inter-rep relationship.  The correlation looks strong for potatoey, weak for buttery and grassy, and particularly poor for painty.  This has a nice explanation: subjects were trained in tasting potatoey flavours, but not any of the others.
 
 If we wanted to explore the relationships between subjects or times or treatments we could follow similar steps.
 

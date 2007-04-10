@@ -35,7 +35,7 @@ rescaler.default <- function(x, type="sd", ...) {
 		sd = (x - mean(x, na.rm=TRUE)) / sd(x, na.rm=TRUE),
 		robust = (x - median(x, na.rm=TRUE)) / mad(x, na.rm=TRUE),
 		I = x,
-		range = (x - min(x)) / diff(range(x))
+		range = (x - min(x, na.rm=TRUE)) / diff(range(x, na.rm=TRUE))
 	)
 }
 
@@ -46,7 +46,7 @@ rescaler.default <- function(x, type="sd", ...) {
 # @arguments other arguments passed to rescaler 
 # @keyword internal
 rescaler.data.frame <- function(x, type="sd", ...) {
-	continuous <- !sapply(x, is.factor)
+	continuous <- sapply(x, is.numeric)
 	x[continuous] <- lapply(x[continuous], rescaler, type=type, ...)
 	x
 }

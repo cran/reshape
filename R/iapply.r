@@ -1,7 +1,7 @@
 # Idempotent apply
-# A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with 
+# A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with \code{\link{stamp}}.
 # 
-# Applied function should return an array, matrix or vector.
+# \code{fun} should return an array, matrix or vector.  
 # 
 # @arguments array
 # @arguments margins to apply over
