@@ -84,7 +84,7 @@
 #X cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 #X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 #X lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")
-cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA) {
+cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE) {
   if (!is.character(formula)) formula <- deparse(substitute(formula))
 	subset <- eval(substitute(subset), data, parent.frame())  
 	data <- data[subset, , drop=FALSE]  
@@ -99,10 +99,10 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 	
 	if (!is.null(variables$l)) {
 		res <- nested.by(data, data[variables$l], function(x) {
-			reshape1(x, variables$m, fun.aggregate, margins=margins, df=df, fill=fill, ...)
+			reshape1(x, variables$m, fun.aggregate, margins=margins, df=df, fill=fill, add.missing=add.missing, ...)
 		})	
 	} else {
-		res <- reshape1(data, variables$m, fun.aggregate, margins=margins, df=df,fill=fill, ...)
+		res <- reshape1(data, variables$m, fun.aggregate, margins=margins, df=df,fill=fill, add.missing=add.missing, ...)
 	}
 	#attr(res, "formula") <- formula
 	#attr(res, "data") <- deparse(substitute(data))
@@ -160,7 +160,7 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 #X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_row"))
 #X 
 #X reshape1(airquality.d, list(c("month"), c("variable")), function(x) diff(range(x))) 
-reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, fill=NA, ...) {
+reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, fill=NA, add.missing=FALSE, ...) {
 	vars.clean <- lapply(vars, clean.vars)
 	variables <- unlist(vars.clean)
 	
@@ -193,7 +193,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), fun.aggregate, ..., df=df)
 	
 	result <- sort_df(rbind.fill(data.r, margins.r), unlist(vars))
-	result <- add.missing.levels(result, unlist(vars), fill=fill)
+	if (add.missing) result <- add.missing.levels(result, unlist(vars), fill=fill)
 	result <- add.all.combinations(result, vars, fill=fill)
 
 	dimnames <- lapply(vars, function(x) dim_names(result, x))
@@ -223,7 +223,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 # @keyword internal 
 #X rdunif <- 
 #X   function(n=20, min=0, max=10) floor(runif(n,min, max))
-#X df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif())
+#X df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif(), result=1:20)
 #X add.all.combinations(df)
 #X add.all.combinations(df, list("a", "b"))
 #X add.all.combinations(df, list("a", "b"), fill=0)
@@ -240,16 +240,19 @@ add.all.combinations <- function(data, vars = list(NULL), fill=NA) {
 	result <- merge_recurse(list(data, all.combinations)) 
 	
 	# fill missings with fill value
-	if (!is.na(fill)) result[is.na(result)] <- fill
+	if (is.list(result$result)) {
+		result$result[sapply(result$result, is.null)] <- fill		
+	} else {
+		result$result[is.na(result$result)] <- fill
+	}
+	
 
 	sort_df(result, unlist(vars))
 }
 
 # Add in any missing values
 # @keyword internal
-add.missing.levels <- function(data, vars=NULL, fill=NA) {
-	return(data) 
-	
+add.missing.levels <- function(data, vars=NULL, fill=NA) {	
 	if (is.null(vars)) return(data)
 	cat <- sapply(data[,vars, drop=FALSE], is.factor)
 

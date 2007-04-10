@@ -1,8 +1,0 @@
-                        
- result_variable min max
-        variable min max
-          potato  NA  NA
-         buttery  NA  NA
-          grassy  NA  NA
-          rancid  NA  NA
-          painty  NA  NA

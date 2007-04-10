@@ -6,7 +6,7 @@
 \description{
 Stamp is like reshape but the "stamping" function is passed the entire data frame, instead of just a few variables.
 }
-\usage{stamp(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE)}
+\usage{stamp(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE, add.missing=FALSE)}
 \arguments{
 \item{data}{data.frame (no molten)}
 \item{formula}{formula that describes arrangement of result, columns ~ rows, see \code{\link{reshape}} for more information}
@@ -14,6 +14,7 @@ Stamp is like reshape but the "stamping" function is passed the entire data fram
 \item{...}{arguments passed to the aggregation function}
 \item{margins}{margins to compute (character vector, or \code{TRUE} for all margins), can contain \code{grand_row} or \code{grand_col} to inclue grand row or column margins respectively.}
 \item{subset}{logical vector by which to subset the data frame, evaluated in the context of the data frame so you can}
+\item{add.missing}{}
 }
 
 \details{It is very similar to the \code{\link{by}} function except in the form

@@ -1,7 +1,0 @@
-                                                   
-  variable buttery grassy painty potato rancid    .
- treatment buttery grassy painty potato rancid    .
-         1    1.78  0.649   2.58   6.89   4.07 3.19
-         2    1.97  0.663   2.46   7.00   3.62 3.15
-         3    1.72  0.681   2.53   6.97   3.87 3.15
-         .    1.82  0.664   2.52   6.95   3.85 3.16

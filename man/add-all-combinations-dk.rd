@@ -18,7 +18,7 @@ dimensionaliy with no missing cells.}
 
 \examples{rdunif <- 
 function(n=20, min=0, max=10) floor(runif(n,min, max))
-df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif())
+df <- data.frame(a = rdunif(), b = rdunif(),c = rdunif(), result=1:20)
 add.all.combinations(df)
 add.all.combinations(df, list("a", "b"))
 add.all.combinations(df, list("a", "b"), fill=0)

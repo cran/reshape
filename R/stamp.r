@@ -21,9 +21,9 @@
 #X models <- stamp(french_fries, subject ~ ., function(df) lm(painty ~ time, df))
 #X dim(models)
 #X anova(models[[3,1]])
-stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE) {
+stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE, add.missing=FALSE) {
 	if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
-	cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE)
+	cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE,add.missing=add.missing)
 }
 
 # Condense a data frame

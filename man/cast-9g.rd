@@ -6,7 +6,7 @@
 \description{
 Cast a molten data frame into the reshaped or aggregated form you want
 }
-\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA)}
+\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE)}
 \arguments{
 \item{data}{molten data frame, see \code{\link{melt}}}
 \item{formula}{casting formula, see details for specifics}
@@ -16,6 +16,7 @@ Cast a molten data frame into the reshaped or aggregated form you want
 \item{subset}{logical vector to subset data set with before reshaping}
 \item{df}{value with which to fill in structural missings}
 \item{fill}{}
+\item{add.missing}{}
 }
 
 \details{Along with \code{\link{melt}}  and \link{recast}, this is the only function you should ever need to use.
