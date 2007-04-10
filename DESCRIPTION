@@ -1,7 +1,7 @@
 Package: reshape
 Type: Package
 Title: Flexibly reshape data.
-Version: 0.7.3
+Version: 0.7.4
 Date: 2007-04-10
 Author: Hadley Wickham <h.wickham@gmail.com>
 Maintainer: Hadley Wickham <h.wickham@gmail.com>
@@ -9,4 +9,4 @@ Description: Reshape lets you flexibly restructure and aggregate data using just
 Suggests: butler
 License: MIT
 LazyData: true
-Packaged: Mon May 21 20:35:16 2007; hadley
+Packaged: Wed May 30 19:44:22 2007; hadley

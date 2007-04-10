@@ -92,7 +92,7 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 
 	v <- unlist(variables)
 	v <- v[v != "result_variable"]
-	data[v] <- lapply(data[v], as.factor)
+	if (add.missing) data[v] <- lapply(data[v], as.factor)
 
 	if (length(fun.aggregate) > 1) 
 		fun.aggregate <- do.call(funstofun, as.list(match.call()[[4]])[-1])
