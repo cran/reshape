@@ -3,10 +3,11 @@
 # 
 # @arguments data frame
 # @arguments margins to compute
+# @arguments all id variables
 # @arguments aggregation function
 # @arguments other argument passed to aggregation function
 # @keyword internal 
-compute.margins <- function(data, margins, fun.aggregate, ..., df=FALSE) {
+compute.margins <- function(data, margins, vars, fun.aggregate, ..., df=FALSE) {
 	if (length(margins) == 0) return(data.frame())
 	
 	if (missing(fun.aggregate) || is.null(fun.aggregate)) {
@@ -15,12 +16,25 @@ compute.margins <- function(data, margins, fun.aggregate, ..., df=FALSE) {
 	}
 	exp <- function(x) {
 		if (df) {
-			condense.df(data, x, fun.aggregate, ...)
+			out <- condense.df(data, x, fun.aggregate, ...)
 		} else {
-			expand(condense(data, x, fun.aggregate, ...))
+			out <- expand(condense(data, x, fun.aggregate, ...))
 		}
+		others <- setdiff(unlist(vars), x)
+		out[, others] <- factor("(all)")
+		out[, unlist(vars)] <- lapply(out[, unlist(vars)], factor)
+		
+		out
 	}
-	do.call("rbind.fill",lapply(margins, exp))
+	df <- do.call("rbind",lapply(margins, exp))
+	cat <- sapply(df, is.factor)
+	
+	fixlevel <- function(x) {
+		factor(x, levels=c(setdiff(levels(x), "(all)"), "(all)"))
+	}
+	
+	df[cat] <- lapply(df[cat], fixlevel)
+	df[, c(which(cat), which(!cat))]
 }
 
 
@@ -61,9 +75,12 @@ margin.vars <- function(vars = list(NULL, NULL), margins = NULL) {
 
 	if (grand.row && !is.null(rows)) margins.all <- compact(c(margins.all, list(cols), list(col.margins)))
 	if (grand.col && !is.null(cols)) margins.all <- compact(c(margins.all, list(rows), list(row.margins)))
-	if (grand.col && grand.row && !is.null(rows)  && !is.null(cols)) margins.all <- c(margins.all, list(numeric(0)))
-
 	
+	if (
+		(grand.col && grand.row && !is.null(rows) && !is.null(cols)) || 
+		(grand.row && !is.null(rows) && is.null(cols)) || 
+		(grand.col && !is.null(cols) && is.null(rows))
+	) margins.all <- c(margins.all, list(numeric(0)))
 	
 	duplicates <- duplicated(lapply(lapply(margins.all,function(x) if(!is.null(x)) sort(x)), paste, collapse=""))
 	

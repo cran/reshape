@@ -9,10 +9,17 @@ Melt an object into a form suitable for easy casting.
 \usage{melt(data, ...)}
 \arguments{
 \item{data}{Data set to melt}
-\item{...}{Other arguments passed to the melt function}
+\item{...}{Other arguments passed to the specific melt method}
 }
 
-\details{See \code{\link{melt.data.frame}} and \code{\link{melt.array}} for details.}
+\details{This the generic melt function. See the following functions
+for specific details for different data structures:
+
+\itemize{
+\item \code{\link{melt.data.frame}} for data.frames
+\item \code{\link{melt.array}} for arrays, matrices and tables
+\item \code{\link{melt.list}} for lists
+}}
 
 \examples{}
 \keyword{manip}

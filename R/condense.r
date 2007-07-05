@@ -50,7 +50,7 @@ expand <- function(data) {
 	exp <- lapply(1:length(first), function(x) as.vector(unlist(lapply(data$result, "[", x))))
 	names(exp) <- if (is.null(names(first))) make.names(1:length(first)) else make.names(names(first))
 
-	x <- melt(data.frame(data[, 1:(ncol(data)-1), drop=FALSE], exp), m=names(exp),variable_name="result_variable", preserve.na = TRUE)
+	x <- melt(data.frame(data[, seq_len(ncol(data) -1), drop=FALSE], exp), m=names(exp),variable_name="result_variable")
 	colnames(x)[match("value", colnames(x), FALSE)] <- "result"
 	x
 }

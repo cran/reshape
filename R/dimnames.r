@@ -28,7 +28,7 @@ rdimnames <- function(x) attr(x, "rdimnames")
 "rdimnames<-" <- function(x, value) {
   
   name <- function(df) {
-    rownames(df) <- gsub("NA", ".", apply(df, 1, paste, collapse="_"))
+    rownames(df) <- apply(df, 1, paste, collapse="_")
     df
   }
 	
@@ -63,7 +63,7 @@ as.data.frame.cast_matrix <- function(x, row.names, optional, ...) {
 
 	colnames(unx) <- rownames(rcolnames(x))
 	
-	r.df <- data.frame(rrownames(x), unx)
+	r.df <- data.frame(rrownames(x), unx, check.names=FALSE)
 	class(r.df) <- c("cast_df", "data.frame")
 	attr(r.df, "idvars") <- attr(x, "idvars")
 	attr(r.df, "rdimnames") <- attr(x, "rdimnames")

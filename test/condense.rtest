@@ -19,8 +19,8 @@ test_margin_vars <- function() {
 
 test_condense <- function() {
 	names(airquality) <- tolower(names(airquality))
-	airquality.d <- melt(airquality, id=c("month", "day"))
-	df <- airquality.d
+	aqm <- melt(airquality, id=c("month", "day"))
+	df <- aqm
 
 	assert.equal(
 		sort(as.vector(tapply(df$value, df$variable, mean))),

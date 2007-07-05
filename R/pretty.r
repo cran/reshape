@@ -40,6 +40,5 @@ strip.dups <- function(df) {
 	clear.dup <- function(dups,ret=dups) ifelse(duplicated(dups), "", ret)
 
 	mat <- apply(df, c(1,2), as.character)
-	mat[is.na(mat)] <- "."
 	do.call(cbind, lapply(1:ncol(mat), function(x) clear.dup(mat[,1:x, drop=FALSE], mat[,x, drop=FALSE])))
 }

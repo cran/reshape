@@ -4,7 +4,7 @@
 \author{Hadley Wickham <h.wickham@gmail.com>}
 
 \description{
-
+Melting a list recursively melts each component of the list and joins the results together
 }
 \usage{melt.list(data, ..., level=1)}
 \arguments{

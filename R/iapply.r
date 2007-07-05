@@ -1,7 +1,11 @@
 # Idempotent apply
 # A version of apply that works like apply, but returns the array in the same shape as the original.  This is useful in conjunction with \code{\link{stamp}}.
 # 
-# \code{fun} should return an array, matrix or vector.  
+# iapply is idempotent in the sense that \code{iapply(x, a, function(x) x)}
+# will always return \code{x} for any value \code{a}.  This is different
+# to apply, which returns a permutation of the original matrix.
+#
+# \code{fun} should return an array, matrix or vector.
 # 
 # @arguments array
 # @arguments margins to apply over
@@ -10,6 +14,7 @@
 # @arguments remove extraneous (length 1) dimensions?
 # @arguments use original dimnames?
 # @argument reorder 
+# @seealso \code{\link{apply}} for the function which this is based on 
 # @keyword manip 
 #X a <- array(1:27, c(2,3,4))
 #X all.equal(a, iapply(a, 1, force))

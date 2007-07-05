@@ -17,8 +17,12 @@ A version of apply that works like apply, but returns the array in the same shap
 \item{REORDER}{}
 }
 
-\details{\code{fun} should return an array, matrix or vector.}
+\details{iapply is idempotent in the sense that \code{iapply(x, a, function(x) x)}
+will always return \code{x} for any value \code{a}.  This is different
+to apply, which returns a permutation of the original matrix.
 
+\code{fun} should return an array, matrix or vector.}
+\seealso{\code{\link{apply}} for the function which this is based on}
 \examples{a <- array(1:27, c(2,3,4))
 all.equal(a, iapply(a, 1, force))
 all.equal(a, iapply(a, 2, force))

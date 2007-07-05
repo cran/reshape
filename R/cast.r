@@ -39,42 +39,42 @@
 # @arguments vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins
 # @arguments logical vector to subset data set with before reshaping
 # @arguments value with which to fill in structural missings
-# @seealso \code{\link{reshape1}}, vignette("introduction", "reshape"), \url{http://had.co.nz/reshape/}
+# @seealso \code{\link{reshape1}},  \url{http://had.co.nz/reshape/}
 #X #Air quality example
 #X names(airquality) <- tolower(names(airquality))
-#X airquality.d <- melt(airquality, id=c("month", "day"), preserve.na=FALSE)
+#X aqm <- melt(airquality, id=c("month", "day"), na.rm=TRUE)
 #X 
-#X cast(airquality.d, day ~ month ~ variable)
-#X cast(airquality.d, month ~ variable, mean)
-#X cast(airquality.d, month ~ . | variable, mean)
-#X cast(airquality.d, month ~ variable, mean, margins=c("grand_row", "grand_col"))
-#X cast(airquality.d, day ~ month, mean, subset=variable=="ozone")
-#X cast(airquality.d, month ~ variable, range)
-#X cast(airquality.d, month ~ variable + result_variable, range)
-#X cast(airquality.d, variable ~ month ~ result_variable,range)
+#X cast(aqm, day ~ month ~ variable)
+#X cast(aqm, month ~ variable, mean)
+#X cast(aqm, month ~ . | variable, mean)
+#X cast(aqm, month ~ variable, mean, margins=c("grand_row", "grand_col"))
+#X cast(aqm, day ~ month, mean, subset=variable=="ozone")
+#X cast(aqm, month ~ variable, range)
+#X cast(aqm, month ~ variable + result_variable, range)
+#X cast(aqm, variable ~ month ~ result_variable,range)
 #X
 #X #Chick weight example
 #X names(ChickWeight) <- tolower(names(ChickWeight))
-#X chick.d <- melt(ChickWeight, id=2:4, preserve.na = FALSE)
+#X chick_m <- melt(ChickWeight, id=2:4, na.rm=TRUE)
 #X 
-#X cast(chick.d, time ~ variable, mean) # average effect of time
-#X cast(chick.d, diet ~ variable, mean) # average effect of diet
-#X cast(chick.d, diet ~ time ~ variable, mean) # average effect of diet & time
+#X cast(chick_m, time ~ variable, mean) # average effect of time
+#X cast(chick_m, diet ~ variable, mean) # average effect of diet
+#X cast(chick_m, diet ~ time ~ variable, mean) # average effect of diet & time
 #X 
 #X # How many chicks at each time? - checking for balance
-#X cast(chick.d, time ~ diet, length)
-#X cast(chick.d, chick ~ time, mean)
-#X cast(chick.d, chick ~ time, mean, subset=time < 10 & chick < 20)
+#X cast(chick_m, time ~ diet, length)
+#X cast(chick_m, chick ~ time, mean)
+#X cast(chick_m, chick ~ time, mean, subset=time < 10 & chick < 20)
 #X 
-#X cast(chick.d, diet + chick ~ time)
-#X cast(chick.d, chick ~ time ~ diet)
-#X cast(chick.d, diet + chick ~ time, mean, margins="diet")
+#X cast(chick_m, diet + chick ~ time)
+#X cast(chick_m, chick ~ time ~ diet)
+#X cast(chick_m, diet + chick ~ time, mean, margins="diet")
 #X
 #X #Tips example
 #X cast(melt(tips), sex ~ smoker, mean, subset=variable=="total_bill")
 #X cast(melt(tips), sex ~ smoker | variable, mean)
 #X 
-#X ff_d <- melt(french_fries, id=1:4, preserve.na=FALSE)
+#X ff_d <- melt(french_fries, id=1:4, na.rm=TRUE)
 #X cast(ff_d, subject ~ time, length)
 #X cast(ff_d, subject ~ time, length, fill=0)
 #X cast(ff_d, subject ~ time, function(x) 30 - length(x))
@@ -83,7 +83,7 @@
 #X cast(ff_d, variable ~ ., function(x) quantile(x,c(0.25,0.5)))
 #X cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 #X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
-#X lattice::xyplot(X1 ~ X2 | variable, cast(ff_d, ... ~ rep), aspect="iso")
+#X lattice::xyplot(`1` ~ `2` | variable, cast(ff_d, ... ~ rep), aspect="iso")
 cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE) {
   if (!is.character(formula)) formula <- deparse(substitute(formula))
 	subset <- eval(substitute(subset), data, parent.frame())  
@@ -123,43 +123,50 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 # @arguments further arguments are passed to aggregating function
 # @seealso \code{\link{cast}}
 # @keyword internal
+#X 
+#X ffm <- melt(french_fries, id=1:4)
+#X # Casting lists ----------------------------
+#X cast(ffm, treatment ~ rep | variable, mean)
+#X cast(ffm, treatment ~ rep | subject, mean)
+#X cast(ffm, treatment ~ rep | time, mean)
+#X cast(ffm, treatment ~ rep | time + variable, mean)
 #X names(airquality) <- tolower(names(airquality))
-#X airquality.d <- melt(airquality, id=c("month", "day"), preserve=FALSE)
+#X aqm <- melt(airquality, id=c("month", "day"), preserve=FALSE)
 #X #Basic call
-#X reshape1(airquality.d, list("month", NULL), mean)
-#X reshape1(airquality.d, list("month", "variable"), mean)
-#X reshape1(airquality.d, list("day", "month"), mean)
+#X reshape1(aqm, list("month", NULL), mean)
+#X reshape1(aqm, list("month", "variable"), mean)
+#X reshape1(aqm, list("day", "month"), mean)
 #X 
-#X #Explore margins
-#X reshape1(airquality.d, list("month", NULL), mean, "month")
-#X reshape1(airquality.d, list("month", NULL) , mean, "grand_col")
-#X reshape1(airquality.d, list("month", NULL) , mean, "grand_row")
+#X #Explore margins  ----------------------------
+#X reshape1(aqm, list("month", NULL), mean, "month")
+#X reshape1(aqm, list("month", NULL) , mean, "grand_col")
+#X reshape1(aqm, list("month", NULL) , mean, "grand_row")
 #X 
-#X reshape1(airquality.d, list(c("month", "day"), NULL), mean, "month")
-#X reshape1(airquality.d, list(c("month"), "variable"), mean, "month")
-#X reshape1(airquality.d, list(c("variable"), "month"), mean, "month")
-#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("month","variable"))
+#X reshape1(aqm, list(c("month", "day"), NULL), mean, "month")
+#X reshape1(aqm, list(c("month"), "variable"), mean, "month")
+#X reshape1(aqm, list(c("variable"), "month"), mean, "month")
+#X reshape1(aqm, list(c("month"), "variable"), mean, c("month","variable"))
 #X 
-#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_row"))
-#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_col"))
-#X reshape1(airquality.d, list(c("month"), "variable"), mean, c("grand_row","grand_col"))
+#X reshape1(aqm, list(c("month"), "variable"), mean, c("grand_row"))
+#X reshape1(aqm, list(c("month"), "variable"), mean, c("grand_col"))
+#X reshape1(aqm, list(c("month"), "variable"), mean, c("grand_row","grand_col"))
 #X 
-#X reshape1(airquality.d, list(c("variable","day"),"month"), mean,c("variable"))
-#X reshape1(airquality.d, list(c("variable","day"),"month"), mean,c("variable","grand_row"))
-#X reshape1(airquality.d, list(c("month","day"), "variable"), mean, "month") 
+#X reshape1(aqm, list(c("variable","day"),"month"), mean,c("variable"))
+#X reshape1(aqm, list(c("variable","day"),"month"), mean,c("variable","grand_row"))
+#X reshape1(aqm, list(c("month","day"), "variable"), mean, "month") 
 #X 
-#X # Multiple fnction returns
-#X reshape1(airquality.d, list(c("month", "result_variable"), NULL), range) 
-#X reshape1(airquality.d, list(c("month"),"result_variable") , range) 
-#X reshape1(airquality.d, list(c("result_variable", "month"), NULL), range) 
+#X # Multiple fnction returns  ----------------------------
+#X reshape1(aqm, list(c("month", "result_variable"), NULL), range) 
+#X reshape1(aqm, list(c("month"),"result_variable") , range) 
+#X reshape1(aqm, list(c("result_variable", "month"), NULL), range) 
 #X 
-#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, "month")
-#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, "variable")
-#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("variable","month"))
-#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_col"))
-#X reshape1(airquality.d, list(c("month", "result_variable"), "variable"), range, c("grand_row"))
+#X reshape1(aqm, list(c("month", "result_variable"), "variable"), range, "month")
+#X reshape1(aqm, list(c("month", "result_variable"), "variable"), range, "variable")
+#X reshape1(aqm, list(c("month", "result_variable"), "variable"), range, c("variable","month"))
+#X reshape1(aqm, list(c("month", "result_variable"), "variable"), range, c("grand_col"))
+#X reshape1(aqm, list(c("month", "result_variable"), "variable"), range, c("grand_row"))
 #X 
-#X reshape1(airquality.d, list(c("month"), c("variable")), function(x) diff(range(x))) 
+#X reshape1(aqm, list(c("month"), c("variable")), function(x) diff(range(x))) 
 reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins, df=FALSE, fill=NA, add.missing=FALSE, ...) {
 	vars.clean <- lapply(vars, clean.vars)
 	variables <- unlist(vars.clean)
@@ -169,7 +176,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 	aggregate <- nrow(unique(data[,variables, drop=FALSE])) < nrow(data) || !is.null(fun.aggregate)
 	if (aggregate) {
 		if (missing(fun.aggregate) || is.null(fun.aggregate)) {
-			warning("Aggregation requires fun.aggregate: length used as default", call.=FALSE)
+			message("Aggregation requires fun.aggregate: length used as default")
 			fun.aggregate <- length
 		}
 		if (!df) {
@@ -177,7 +184,6 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 		} else {
 		  data.r <- condense.df(data, variables, fun.aggregate, ...)
 		}
-
 		if ("result_variable" %in% names(data.r) && !("result_variable" %in% unlist(vars))) {
 			vars[[2]] <- c(vars[[2]], "result_variable")
 		}
@@ -190,12 +196,17 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
     warning("Sorry, you currently can't use margins with high D arrays", .call=FALSE)
     margins <- FALSE
   }
-	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), fun.aggregate, ..., df=df)
-	
+	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), vars.clean, fun.aggregate, ..., df=df)
+
+	if (ncol(margins.r) > 0) {
+		need.factorising <- !sapply(data.r, is.factor) & sapply(margins.r, is.factor)
+		data.r[need.factorising] <- lapply(data.r[need.factorising], factor)
+	}
 	result <- sort_df(rbind.fill(data.r, margins.r), unlist(vars))
+	
 	if (add.missing) result <- add.missing.levels(result, unlist(vars), fill=fill)
 	result <- add.all.combinations(result, vars, fill=fill)
-
+	
 	dimnames <- lapply(vars, function(x) dim_names(result, x))
 
   r <- if (!df) unlist(result$result) else result$result
@@ -280,6 +291,6 @@ dim_names <- function(data, vars) {
 	if (!is.null(vars) && length(vars) > 0) {
 		unique(data[,vars,drop=FALSE]) 
 	} else {
-		data.frame(value="value") # use fun.aggregate instead of "value"? 
+		data.frame(value="(all)") # use fun.aggregate instead of "value"? 
 	}
 }

@@ -22,5 +22,7 @@ melt(a)
 melt(a, varnames=c("X","Y","Z"))
 dimnames(a) <- lapply(dim(a), function(x) LETTERS[1:x])
 melt(a)
-melt(a, varnames=c("X","Y","Z"))}
+melt(a, varnames=c("X","Y","Z"))
+dimnames(a)[1] <- list(NULL)
+melt(a)}
 \keyword{manip}

@@ -12,8 +12,8 @@ test_basic_mekt <- function() {
 	CO2.d <- melt(CO2, m="uptake")
 	assert.equal(c(84,6), dim(CO2.d))
 
-	airquality.d <- melt(airquality, id=c("Month", "Day"))
-	assert.equal(c(568, 4), dim(airquality.d))
+	aqm <- melt(airquality, id=c("Month", "Day"))
+	assert.equal(c(568, 4), dim(aqm))
 	
 }
 
