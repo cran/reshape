@@ -22,11 +22,12 @@
 #X dim(models)
 #X anova(models[[3,1]])
 stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE, add.missing=FALSE) {
-	if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
-	cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE,add.missing=add.missing)
+  if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
+  cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE,add.missing=add.missing, value="")
 }
 
 # Condense a data frame
+# Condense
 # 
 # @arguments data frame
 # @arguments character vector of variables to condense over
@@ -34,21 +35,21 @@ stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subse
 # @arguments arguments passed to condensing function
 # @keyword manip 
 condense.df <- function(data, variables, fun, ...) {
-	if (length(variables) == 0 ) {
-		df <- data.frame(results = 0)
-		df$results <- list(fun(data, ...))
-		return(df)
-	}
+  if (length(variables) == 0 ) {
+    df <- data.frame(results = 0)
+    df$results <- list(fun(data, ...))
+    return(df)
+  }
 
-	sorted <- sort_df(data, variables)
-	duplicates <- duplicated(sorted[,variables, drop=FALSE])
-	index <- cumsum(!duplicates)
+  sorted <- sort_df(data, variables)
+  duplicates <- duplicated(sorted[,variables, drop=FALSE])
+  index <- cumsum(!duplicates)
 
-	results <- by(sorted, index, fun, ...)
+  results <- by(sorted, index, fun, ...)
 
-	cols <- sorted[!duplicates,variables, drop=FALSE]
-	cols$results <- array(results)
-	cols
+  cols <- sorted[!duplicates,variables, drop=FALSE]
+  cols$results <- array(results)
+  cols
 }
 
 # Tidy up stamped data set

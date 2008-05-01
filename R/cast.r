@@ -11,7 +11,7 @@
 # not used in the formula and "." represents no variable, so you can do \code{formula=var1 ~ .}
 #
 # Creating high-D arrays is simple, and allows a class of transformations that are hard
-# without \code{\link{iapply}} and \code{\link{sweep}} 
+# without \code{\link{apply}} and \code{\link{sweep}} 
 #
 # If the combination of variables you supply does not uniquely identify one row in the 
 # original data set, you will need to supply an aggregating function, \code{fun.aggregate}.
@@ -38,7 +38,10 @@
 # @arguments further arguments are passed to aggregating function
 # @arguments vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins
 # @arguments logical vector to subset data set with before reshaping
+# @arguments argument used internally
 # @arguments value with which to fill in structural missings
+# @argument should all missing combinations be displayed?
+# @argument name of column which stores values, see \code{\link{guess_value}} for default strategies to figure this out
 # @seealso \code{\link{reshape1}},  \url{http://had.co.nz/reshape/}
 #X #Air quality example
 #X names(airquality) <- tolower(names(airquality))
@@ -84,11 +87,15 @@
 #X cast(ff_d, treatment ~ variable, mean, margins=c("grand_col", "grand_row"))
 #X cast(ff_d, treatment + subject ~ variable, mean, margins="treatment")
 #X lattice::xyplot(`1` ~ `2` | variable, cast(ff_d, ... ~ rep), aspect="iso")
-cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE) {
-  if (!is.character(formula)) formula <- deparse(substitute(formula))
+cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE, value = guess_value(data)) {
+	if (is.formula(formula))    formula <- deparse(formula)
+	if (!is.character(formula)) formula <- as.character(formula)
+
 	subset <- eval(substitute(subset), data, parent.frame())  
 	data <- data[subset, , drop=FALSE]  
 	variables <- cast_parse_formula(formula, names(data))
+
+  if (any(names(data) == value))  names(data)[names(data) == value] <- "value"
 
 	v <- unlist(variables)
 	v <- v[v != "result_variable"]
@@ -96,6 +103,7 @@ cast <- function(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margin
 
 	if (length(fun.aggregate) > 1) 
 		fun.aggregate <- do.call(funstofun, as.list(match.call()[[4]])[-1])
+  if (!is.null(fun.aggregate) && is.character(fun.aggregate)) fun.aggregate <- match.fun(fun.aggregate)
 	
 	if (!is.null(variables$l)) {
 		res <- nested.by(data, data[variables$l], function(x) {
@@ -194,6 +202,7 @@ reshape1 <- function(data, vars = list(NULL, NULL), fun.aggregate=NULL, margins,
 
   if (length(vars.clean) > 2 && margins) {
     warning("Sorry, you currently can't use margins with high D arrays", .call=FALSE)
+    
     margins <- FALSE
   }
 	margins.r <- compute.margins(data, margin.vars(vars.clean, margins), vars.clean, fun.aggregate, ..., df=df)
@@ -249,14 +258,16 @@ add.all.combinations <- function(data, vars = list(NULL), fill=NA) {
 		lapply(vars, function(cols) data[, cols, drop=FALSE])
 	)	
 	result <- merge_recurse(list(data, all.combinations)) 
-	
+
 	# fill missings with fill value
-	if (is.list(result$result)) {
-		result$result[sapply(result$result, is.null)] <- fill		
-	} else {
-		result$result[is.na(result$result)] <- fill
-	}
-	
+	if (!is.na(fill)) {
+		if (is.list(result$result)) {
+			result$result[sapply(result$result, is.null)] <- fill
+		} else {
+			data_col <- matrix(!names(result) %in% unlist(vars), nrow=nrow(result), ncol=ncol(result), byrow=TRUE)
+			result[is.na(result) & data_col] <- fill
+		}
+	}	
 
 	sort_df(result, unlist(vars))
 }

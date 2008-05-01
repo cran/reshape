@@ -6,7 +6,7 @@
 \description{
 Cast a molten data frame into the reshaped or aggregated form you want
 }
-\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE)}
+\usage{cast(data, formula = ... ~ variable, fun.aggregate=NULL, ..., margins=FALSE, subset=TRUE, df=FALSE, fill=NA, add.missing=FALSE, value = guess_value(data))}
 \arguments{
 \item{data}{molten data frame, see \code{\link{melt}}}
 \item{formula}{casting formula, see details for specifics}
@@ -14,9 +14,10 @@ Cast a molten data frame into the reshaped or aggregated form you want
 \item{...}{further arguments are passed to aggregating function}
 \item{margins}{vector of variable names (can include "grand\_col" and "grand\_row") to compute margins for, or TRUE to computer all margins}
 \item{subset}{logical vector to subset data set with before reshaping}
-\item{df}{value with which to fill in structural missings}
-\item{fill}{}
+\item{df}{argument used internally}
+\item{fill}{value with which to fill in structural missings}
 \item{add.missing}{}
+\item{value}{}
 }
 
 \details{Along with \code{\link{melt}}  and \link{recast}, this is the only function you should ever need to use.
@@ -29,7 +30,7 @@ fastest.  There are a couple of special variables: "..." represents all other va
 not used in the formula and "." represents no variable, so you can do \code{formula=var1 ~ .}
 
 Creating high-D arrays is simple, and allows a class of transformations that are hard
-without \code{\link{iapply}} and \code{\link{sweep}}
+without \code{\link{apply}} and \code{\link{sweep}}
 
 If the combination of variables you supply does not uniquely identify one row in the
 original data set, you will need to supply an aggregating function, \code{fun.aggregate}.

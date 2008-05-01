@@ -58,15 +58,17 @@ all.vars.character <- function(formula, blank.char = ".") {
 # Checks that formula is a valid reshaping formula.
 #
 # \enumerate{
-#   \item expressions match known variables
-#	 \item same variable not used on both sides
+#   \item variable names not found in molten data
+#   \item same variable used in multiple places
 # }
 # @arguments formula to check
 # @arguments vector of variable names
 # @keyword internal
 check_formula <- function(formula, varnames) {
 	vars <- unlist(all.vars.character(formula))
-	if (!all(vars %in% c(".", "...","result_variable",varnames))) stop("Formula contains variables not in list of known variables")
+	unknown <- setdiff(vars, c(".", "...","result_variable",varnames))
+	
+	if (length(unknown) > 0) stop("Casting formula contains variables not found in molten data: ", paste(unknown, collapse=", "), call. = FALSE)
 	vars <- vars[vars != "."]
-	if (length(unique(vars)) < length(vars)) stop("Variable names repeated")
+	if (length(unique(vars)) < length(vars)) stop("Variable names repeated", call. = FALSE)
 }
