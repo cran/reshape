@@ -25,4 +25,4 @@ function.  You will probably want to save the results to a variable and
 then use extract the results.  See the examples.}
 
 \examples{}
-\keyword{internal}
+\keyword{manip}

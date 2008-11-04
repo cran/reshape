@@ -14,7 +14,7 @@
 # @arguments arguments passed to the aggregation function
 # @arguments margins to compute (character vector, or \code{TRUE} for all margins), can contain \code{grand_row} or \code{grand_col} to inclue grand row or column margins respectively.
 # @arguments logical vector by which to subset the data frame, evaluated in the context of the data frame so you can 
-#@keyword internal 
+#@keyword manip 
 stamp <- function(data, formula = . ~ ., fun.aggregate, ..., margins=NULL, subset=TRUE, add.missing=FALSE) {
   if (inherits(formula, "formula")) formula <- deparse(substitute(formula)) 
   cast(data, formula, fun.aggregate, ..., margins=margins, subset=subset, df=TRUE,add.missing=add.missing, value="")
