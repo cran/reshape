@@ -1,4 +1,11 @@
-Reshape 0.8.1 (2008-XX-XX) --------------------------
+Reshape 0.8.2 (2008-11-04) --------------------------
+
+  * fixed bug where missing fill values where not getting correctly filled
+
+  * fill value defaults to fun.aggregate applied to zero-length vector.  This produces better values in a wide variety of situations, for example missings will be filled with 0's when length or sum is used.  This may require setting fill = NA for aggregation functions that previously return NA, like sd and var.
+
+
+Reshape 0.8.1 (2008-05-01) --------------------------
   
 Melt
 
@@ -8,6 +15,7 @@ Melt
 
 Cast
 
+  * missing values in subsetting are now correctly dropped to match behaviour of subset()
   * tweaks to cast and recast to make it easier to pass in formulas created elsewhere
   * allow user to specify column used for values, guessing if necessary, and giving a warning message if value column does not exist
   * improve error messages when melt or casting parameters incorrectly specified 
