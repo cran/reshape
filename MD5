@@ -1,8 +1,8 @@
 4ec210e8ef551307ee7fc870d167fbea *CHANGELOG
-356bca7ad66b699a82543c275f40c7eb *DESCRIPTION
-c7ea166b434ab74f81ce002ea5d87b07 *LICENSE
-16b3d85a626fc9849efb8d03c1e5e0da *NAMESPACE
-1fcdf72bdc9260a644599ae31126f10c *NEWS
+114e1c38d6e56406305f25f26577622f *DESCRIPTION
+581827da3959cce1750fb90f1eb98ec8 *LICENSE
+e9d0e50b592127b51323caa506853e1a *NAMESPACE
+4c9e0b34d99103dd9eda663a12f8b21f *NEWS
 d29587c851a9369450419492f344693e *R/cast.r
 0e207eeffd3dda9124769723c4d3623c *R/condense.r
 01bc93013826a532485da25ebc012a59 *R/dimnames.r
@@ -19,7 +19,7 @@ df49a27b899e8e1171799eab7a252b00 *R/stamp.r
 11d6f343f97ca34edc7cb5ad4a174d05 *data/french_fries.rda
 931bb9da3bce71ebcb25ba53c5dcd1e5 *data/smiths.rda
 6a3f0a74f813cd68547e665f42b8a3cb *data/tips.rda
-61445c2aa8064e816b981712ec2132a2 *inst/CITATION
+0c62370c358d7ba0f8fd3a6480a62903 *inst/CITATION
 4bfb5681ced65b27a57357f2679e1273 *man/add-all-combinations-dk.rd
 195cb4dc67494405bfb9cbe2c2d7f3a0 *man/add-missing-levels-ko.rd
 aa1c0744c841fe83790e0b92bb4dc386 *man/all-vars-character-rs.rd
