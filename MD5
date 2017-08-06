@@ -1,8 +1,8 @@
 4ec210e8ef551307ee7fc870d167fbea *CHANGELOG
-114e1c38d6e56406305f25f26577622f *DESCRIPTION
+86e17092167e4938f2e73510d7d6ffc4 *DESCRIPTION
 581827da3959cce1750fb90f1eb98ec8 *LICENSE
 e9d0e50b592127b51323caa506853e1a *NAMESPACE
-4c9e0b34d99103dd9eda663a12f8b21f *NEWS
+396973455bcc91d755fbfab70557a509 *NEWS
 d29587c851a9369450419492f344693e *R/cast.r
 0e207eeffd3dda9124769723c4d3623c *R/condense.r
 01bc93013826a532485da25ebc012a59 *R/dimnames.r
@@ -19,7 +19,7 @@ df49a27b899e8e1171799eab7a252b00 *R/stamp.r
 11d6f343f97ca34edc7cb5ad4a174d05 *data/french_fries.rda
 931bb9da3bce71ebcb25ba53c5dcd1e5 *data/smiths.rda
 6a3f0a74f813cd68547e665f42b8a3cb *data/tips.rda
-0c62370c358d7ba0f8fd3a6480a62903 *inst/CITATION
+134c9659aa6e7c8ed4a9e362cdec561f *inst/CITATION
 4bfb5681ced65b27a57357f2679e1273 *man/add-all-combinations-dk.rd
 195cb4dc67494405bfb9cbe2c2d7f3a0 *man/add-missing-levels-ko.rd
 aa1c0744c841fe83790e0b92bb4dc386 *man/all-vars-character-rs.rd
