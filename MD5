@@ -1,14 +1,14 @@
 4ec210e8ef551307ee7fc870d167fbea *CHANGELOG
-76fc013f02a6f79f18c56e3b6deefe39 *DESCRIPTION
+2251d684c09b675c9ed8420b533404bc *DESCRIPTION
 581827da3959cce1750fb90f1eb98ec8 *LICENSE
 9b71eb955f409fb4185d582abcf30e17 *NAMESPACE
-f6885fda4a9a31cf0f5155fedbd1d7ba *NEWS
+7bdba047fbb9981968346eed1fc05254 *NEWS
 d29587c851a9369450419492f344693e *R/cast.r
 0e207eeffd3dda9124769723c4d3623c *R/condense.r
 01bc93013826a532485da25ebc012a59 *R/dimnames.r
 391c244786968bc7134cf14e2ce0c02b *R/factors.r
 7fd941c6948b0c0f02073219c5e79e8b *R/formula.r
-c77bd1c6ae03b0dc4543ea5fad51f787 *R/margins.r
+7557200299cbc140837c045596545630 *R/margins.r
 6cacfe26ac5424be6775bb1a0681354e *R/melt.r
 238526badf752642575dc9e3fb2c0142 *R/pretty.r
 de4bf763e84fd4a5c72e3d40b9ea4861 *R/recast.r
@@ -19,7 +19,7 @@ df49a27b899e8e1171799eab7a252b00 *R/stamp.r
 11d6f343f97ca34edc7cb5ad4a174d05 *data/french_fries.rda
 931bb9da3bce71ebcb25ba53c5dcd1e5 *data/smiths.rda
 6a3f0a74f813cd68547e665f42b8a3cb *data/tips.rda
-134c9659aa6e7c8ed4a9e362cdec561f *inst/CITATION
+478bdd6995278698c95e8483d27373aa *inst/CITATION
 4bfb5681ced65b27a57357f2679e1273 *man/add-all-combinations-dk.rd
 195cb4dc67494405bfb9cbe2c2d7f3a0 *man/add-missing-levels-ko.rd
 1b6dca1e2445479a14e73587da2adf8d *man/all-vars-character-rs.rd
@@ -43,7 +43,7 @@ e05e711a82224b66c2a2fc15ba878664 *man/condense-ss.rd
 46f10536ede1fd678493947b020ea2d0 *man/french-fries.rd
 9dab49841aea9ea216659f61c749182b *man/funstofun-gl.rd
 8dbdc425561d10412b1ed458aaf2ff3e *man/guess-value-2f.rd
-9a3a34be7d066432d4174caec53853f7 *man/margin-vars-rw.rd
+a0185146a4790a8e1008e2bd7114490f *man/margin-vars-rw.rd
 500bd5b1e6965386c00c37df816b723a *man/melt-24.rd
 2872532c1b996f6ba3fc57c16aa5388f *man/melt-array-e0.rd
 b3aa9c8f3771baa895227107a42fd165 *man/melt-cast-df-c7.rd
